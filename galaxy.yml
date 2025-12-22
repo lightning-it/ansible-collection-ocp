@@ -1,0 +1,39 @@
+---
+namespace: lit
+name: ocp
+version: 1.0.0
+readme: README.md
+description: >
+  Opinionated Ansible collection for Red Hat OpenShift Container Platform
+  in the ModuLix ecosystem. Provides roles for cluster
+  bring-up, day-2 operations and platform services on top of OpenShift.
+
+repository: "https://github.com/lightning-it/ansible-collection-ocp"
+authors:
+  - "Lightning IT"
+license:
+  - GPL-2.0-only
+tags:
+  - ocp
+  - openshift
+  - kubernetes
+  - platform
+  - day2
+  - automation
+  - devops
+
+dependencies:
+  ansible.posix: "*"
+  kubernetes.core: "*"
+
+build_ignore:
+  - node_modules
+  - vagrant
+  - .git
+  - .github
+  - .gitignore
+  - .molecule
+  - ansible_collections
+  - infra
+  - "*.terraform*"
+  - "*.tar.gz"
