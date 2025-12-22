@@ -1,0 +1,26 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: 00-app-of-apps
+  namespace: openshift-gitops
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: .
+    repoURL: "{{ git_git_repo_url }}/app-of-apps.git"
+    targetRevision: "{{ git_target_revision }}"
+    helm:
+      valueFiles:
+{% for vf in git_value_files %}
+        - {{ vf }}
+{% endfor %}
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true
+    syncOptions:
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=false
