@@ -1,11 +1,25 @@
 {
+  "name": "ansible-collection-ocp",
+  "version": "0.0.0",
+  "private": true,
+  "description": "OpenShift-focused Ansible collection for ModuLix. Provides opinionated roles for Red Hat OpenShift cluster bring-up, day-2 operations, and platform services.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lightning-it/ansible-collection-ocp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lightning-it/ansible-collection-ocp/issues"
+  },
+  "homepage": "https://github.com/lightning-it/ansible-collection-ocp#readme",
+  "license": "GPL-2.0-only",
   "devDependencies": {
-    "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/changelog": "^6.0.0",
+    "@semantic-release/commit-analyzer": "^13.0.0",
+    "@semantic-release/exec": "^7.1.0",
     "@semantic-release/git": "^10.0.1",
-    "@semantic-release/github": "^11.0.6",
-    "@semantic-release/release-notes-generator": "^14.1.0",
-    "conventional-changelog-conventionalcommits": "^9.1.0",
-    "semantic-release": "^24.2.9"
+    "@semantic-release/github": "^9.0.0",
+    "@semantic-release/release-notes-generator": "^14.0.0",
+    "conventional-changelog-conventionalcommits": "^7.0.0",
+    "semantic-release": "^25.0.2"
   }
 }
