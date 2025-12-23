@@ -6,17 +6,21 @@
       ocp_manage_operator_api_version: {{ ocp_manage_operator_api_version }}
       ocp_manage_operator_approve: {{ ocp_manage_operator_approve }}
       ocp_manage_operator_channel: {{ ocp_manage_operator_channel }}
-      ocp_manage_operator_create_namespace: {{ ocp_manage_operator_create_namespace }}
-      ocp_manage_operator_deployment_name: {{ ocp_manage_operator_deployment_name }}
+      ocp_manage_operator_create_namespace:
+        {{ ocp_manage_operator_create_namespace }}
+      ocp_manage_operator_deployment_name:
+        {{ ocp_manage_operator_deployment_name }}
       ocp_manage_operator_name: {{ ocp_manage_operator_name }}
       ocp_manage_operator_namespace: {{ ocp_manage_operator_namespace }}
       ocp_manage_operator_group_name: {{ ocp_manage_operator_group_name }}
       ocp_manage_operator_plan: {{ ocp_manage_operator_plan }}
       ocp_manage_operator_source: {{ ocp_manage_operator_source }}
-      ocp_manage_operator_source_namespace: {{ ocp_manage_operator_source_namespace }}
+      ocp_manage_operator_source_namespace:
+        {{ ocp_manage_operator_source_namespace }}
       ocp_manage_operator_starting_csv: {{ ocp_manage_operator_starting_csv }}
       ocp_manage_operator_state: {{ ocp_manage_operator_state }}
-      ocp_manage_operator_target_namespaces: {{ ocp_manage_operator_target_namespaces }}
+      ocp_manage_operator_target_namespaces:
+        {{ ocp_manage_operator_target_namespaces }}
 
 - name: Create project {{ ocp_manage_operator_namespace }}
   kubernetes.core.k8s:
@@ -95,8 +99,13 @@
     namespace: "{{ ocp_manage_operator_namespace }}"
   register: output_info
   until: >-
-    output_info.resources | json_query('[*].status.conditions[?reason==`AllCatalogSourcesHealthy`][].status')
-    | select ('match','False') | list | length == 1
+    output_info.resources
+    | json_query(
+      '[*].status.conditions[?reason==`AllCatalogSourcesHealthy`][].status'
+    )
+    | select('match', 'False')
+    | list
+    | length == 1
   delay: 10
   retries: 60
   when:
@@ -112,7 +121,9 @@
     namespace: "{{ ocp_manage_operator_namespace }}"
   register: subscription_info
   until: >
-    subscription_info.resources | json_query('[*].status.installplan.kind') | unique == ["InstallPlan"]
+    subscription_info.resources
+    | json_query('[*].status.installplan.kind')
+    | unique == ["InstallPlan"]
   delay: 10
   retries: 60
   when:
@@ -122,15 +133,23 @@
 - name: Wait for install plan and approve install plan
   vars:
     ocp_manage_operator_pending_approval: >-
-      {{ subscription_info.resources | json_query('[*].status.conditions[?reason==`RequiresApproval`][].status')
-      | select('match', 'True') | join() | bool }}
+      {{
+        subscription_info.resources
+        | json_query(
+          '[*].status.conditions[?reason==`RequiresApproval`][].status'
+        )
+        | select('match', 'True')
+        | join()
+        | bool
+      }}
   when:
     - ocp_manage_operator_approve | bool
     - ocp_manage_operator_plan == 'Manual'
     - ocp_manage_operator_state != 'absent'
   block:
 
-    - name: Get current operator currentCSV in {{ ocp_manage_operator_namespace }}
+    - name: >-
+        Get current operator currentCSV in {{ ocp_manage_operator_namespace }}
       kubernetes.core.k8s_info:
         api_version: operators.coreos.com/v1alpha1
         kind: Subscription
@@ -151,7 +170,9 @@
                if (ocp_manage_operator_starting_csv | length == 0)
                else ocp_manage_operator_starting_csv }}
 
-    - name: Wait for install plan with correct CSV in {{ ocp_manage_operator_namespace }}
+    - name: >-
+        Wait for install plan with correct CSV in
+        {{ ocp_manage_operator_namespace }}
       kubernetes.core.k8s_info:
         api_version: operators.coreos.com/v1alpha1
         kind: InstallPlan
@@ -161,7 +182,11 @@
         installplans_info.resources
         | selectattr('spec', 'defined')
         | selectattr('spec.clusterServiceVersionNames', 'defined')
-        | selectattr('spec.clusterServiceVersionNames', 'contains', ocp_manage_operator_starting_csv_search)
+        | selectattr(
+          'spec.clusterServiceVersionNames',
+          'contains',
+          ocp_manage_operator_starting_csv_search
+        )
         | list
         | length > 0
       retries: 10
@@ -174,7 +199,11 @@
           {{ installplans_info.resources
              | selectattr('spec', 'defined')
              | selectattr('spec.clusterServiceVersionNames', 'defined')
-             | selectattr('spec.clusterServiceVersionNames', 'contains', ocp_manage_operator_starting_csv_search)
+             | selectattr(
+               'spec.clusterServiceVersionNames',
+               'contains',
+               ocp_manage_operator_starting_csv_search
+             )
              | list }}
       when: ocp_manage_operator_pending_approval
 
@@ -206,8 +235,13 @@
     wait_timeout: 30
   register: output_info
   until: >
-    output_info.resources | json_query('[*].status.conditions[?reason==`MinimumReplicasAvailable`][].status') |
-    select ('match','True') | list | length == 1
+    output_info.resources
+    | json_query(
+      '[*].status.conditions[?reason==`MinimumReplicasAvailable`][].status'
+    )
+    | select('match', 'True')
+    | list
+    | length == 1
   delay: 10
   retries: 60
 
@@ -226,7 +260,13 @@
   until: >
     deployment_info.resources
     | selectattr('status.conditions', 'defined')
-    | selectattr('status.conditions', 'selectattr', 'reason', 'equalto', 'MinimumReplicasAvailable')
+    | selectattr(
+      'status.conditions',
+      'selectattr',
+      'reason',
+      'equalto',
+      'MinimumReplicasAvailable'
+    )
     | map(attribute='status.conditions')
     | map('selectattr', 'reason', 'equalto', 'MinimumReplicasAvailable')
     | map('first')
@@ -247,12 +287,17 @@
 
 - name: Set installed CSV fact
   ansible.builtin.set_fact:
-    ocp_manage_operator_installed_csv: "{{ subscription_info.resources[0].status.installedCSV }}"
+    ocp_manage_operator_installed_csv: >-
+      {{
+        subscription_info.resources[0].status.installedCSV
+      }}
   when:
     - ocp_manage_operator_state == 'absent'
     - subscription_info.resources[0].status.installedCSV is defined
 
-- name: Delete ClusterServiceVersion {{ ocp_manage_operator_installed_csv | default('') }}
+- name: >-
+    Delete ClusterServiceVersion
+    {{ ocp_manage_operator_installed_csv | default('') }}
   when: ocp_manage_operator_state == 'absent'
   kubernetes.core.k8s:
     state: absent

@@ -6,22 +6,27 @@
     ocp_manage_operator_channel: "{{ gitops_operator_channel }}"
     ocp_manage_operator_source: "{{ gitops_operator_source }}"
     ocp_manage_operator_source_namespace: openshift-marketplace
-    ocp_manage_operator_deployment_name: openshift-gitops-operator-controller-manager
+    ocp_manage_operator_deployment_name: >-
+      openshift-gitops-operator-controller-manager
     ocp_manage_operator_create_namespace: true
     ocp_manage_operator_starting_csv: "{{ gitops_operator_starting_csv }}"
     ocp_manage_operator_approve: "{{ gitops_operator_approve }}"
-    ocp_manage_operator_subscription_extras: "{{ gitops_operator_subscription_extras }}"
+    ocp_manage_operator_subscription_extras: >-
+      {{ gitops_operator_subscription_extras }}
   ansible.builtin.include_role:
     name: ocp_manage_operator
 
-- name: Add cluster-admin role to serviceaccount openshift-gitops-argocd-application-controller
+- name: >-
+    Add cluster-admin role to serviceaccount
+    openshift-gitops-argocd-application-controller
   kubernetes.core.k8s:
     state: present
     definition:
       apiVersion: rbac.authorization.k8s.io/v1
       kind: ClusterRoleBinding
       metadata:
-        name: cluster-admin-openshift-gitops-argocd-application-controller
+        name: >-
+          cluster-admin-openshift-gitops-argocd-application-controller
       roleRef:
         apiGroup: rbac.authorization.k8s.io
         kind: ClusterRole
@@ -37,7 +42,10 @@
       {{
         git_repo_templates | combine({
           item.key: item.value | combine({
-            'password': lookup('community.hashi_vault.hashi_vault', item.value.vault_lookup)
+            'password': lookup(
+              'community.hashi_vault.hashi_vault',
+              item.value.vault_lookup
+            )
           })
         })
       }}
@@ -49,19 +57,37 @@
 
 - name: Create repo secret templates for first deployment
   kubernetes.core.k8s:
-    definition: "{{ lookup('template', 'secrets-repo-credentials-template.yml.j2') | from_yaml_all }}"
+    definition: >-
+      {{
+        lookup(
+          'template',
+          'secrets-repo-credentials-template.yml.j2'
+        ) | from_yaml_all
+      }}
   with_dict: "{{ git_repo_templates }}"
   no_log: true
 
 - name: Create argocd app of apps
   kubernetes.core.k8s:
-    definition: "{{ lookup('template', 'application-00-app-of-apps.yml.j2') | from_yaml_all }}"
+    definition: >-
+      {{
+        lookup(
+          'template',
+          'application-00-app-of-apps.yml.j2'
+        ) | from_yaml_all
+      }}
     state: present
   when: gitops_operator_state != 'absent'
 
 - name: Set argocd to defined state
   kubernetes.core.k8s:
-    definition: "{{ lookup('template', 'argocd-openshift-gitops.yml.j2') | from_yaml_all }}"
+    definition: >-
+      {{
+        lookup(
+          'template',
+          'argocd-openshift-gitops.yml.j2'
+        ) | from_yaml_all
+      }}
     state: "{{ gitops_operator_state }}"
     wait: true
     wait_timeout: 120
@@ -87,16 +113,36 @@
 
 - name: Get approle secrets from vault
   ansible.builtin.set_fact:
-    git_ext_secrets_role_id: "{{ lookup('community.hashi_vault.hashi_vault', git_ext_role_id_lookup) }}"
-    git_ext_secrets_secret_id: "{{ lookup('community.hashi_vault.hashi_vault', git_ext_secret_id_lookup) }}"
+    git_ext_secrets_role_id: >-
+      {{
+        lookup(
+          'community.hashi_vault.hashi_vault',
+          git_ext_role_id_lookup
+        )
+      }}
+    git_ext_secrets_secret_id: >-
+      {{
+        lookup(
+          'community.hashi_vault.hashi_vault',
+          git_ext_secret_id_lookup
+        )
+      }}
   ignore_errors: true
   register: get_secrets
   when: git_vault_enabled
 
 - name: Create approle secret for external secrets
   kubernetes.core.k8s:
-    definition: "{{ lookup('template', 'external-secrets-approle-secret.yml.j2') | from_yaml_all }}"
+    definition: >-
+      {{
+        lookup(
+          'template',
+          'external-secrets-approle-secret.yml.j2'
+        ) | from_yaml_all
+      }}
   when:
-    - git_ext_secrets_role_id is defined and git_ext_secrets_role_id | length > 0
-    - git_ext_secrets_secret_id is defined and git_ext_secrets_secret_id | length > 0
+    - git_ext_secrets_role_id is defined
+      and git_ext_secrets_role_id | length > 0
+    - git_ext_secrets_secret_id is defined
+      and git_ext_secrets_secret_id | length > 0
     - git_vault_enabled
