@@ -20,7 +20,9 @@
   tags:
     - always
 
-- name: Set ins_cluster_kubeconfig_vault_key to selfsigned-CA if CA OU is selfsigned
+- name: >-
+    Set ins_cluster_kubeconfig_vault_key to selfsigned-CA
+    if CA OU is selfsigned
   delegate_to: "{{ ins_delegate_to }}"
   run_once: true
   ansible.builtin.set_fact:

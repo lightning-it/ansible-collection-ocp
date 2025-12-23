@@ -7,11 +7,29 @@
 - name: Fetch values from Vault or fallback
   ansible.builtin.set_fact:
     ins_additional_trust_bundle: >-
-      {{ lookup('community.hashi_vault.hashi_vault', g_root_ca_lookup, default=ins_additional_trust_bundle) }}
+      {{
+        lookup(
+          'community.hashi_vault.hashi_vault',
+          g_root_ca_lookup,
+          default=ins_additional_trust_bundle
+        )
+      }}
     ins_root_ca: >-
-      {{ lookup('community.hashi_vault.hashi_vault', g_root_ca_lookup, default=ins_root_ca) }}
+      {{
+        lookup(
+          'community.hashi_vault.hashi_vault',
+          g_root_ca_lookup,
+          default=ins_root_ca
+        )
+      }}
     ins_pullsecret: >-
-      {{ lookup('community.hashi_vault.hashi_vault', ins_pullsecret_lookup, default=ins_pullsecret) }}
+      {{
+        lookup(
+          'community.hashi_vault.hashi_vault',
+          ins_pullsecret_lookup,
+          default=ins_pullsecret
+        )
+      }}
   no_log: true
   tags:
     - always

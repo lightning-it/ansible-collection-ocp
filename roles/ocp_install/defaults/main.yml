@@ -17,13 +17,19 @@ ins_vsphere_network:
 # ocp config
 ins_base_domain: ''
 ins_cluster_name:
-ins_vault_path: "{{ cluster_id[8:11] }}/{{ cluster_id[11:14] }}/{{ cluster_id }}"
+ins_vault_path: >-
+  {{ cluster_id[8:11] }}/{{ cluster_id[11:14] }}/{{ cluster_id }}
 ins_version: 4.18.13
 ins_os: linux
 ins_arch: x86_64
 ins_loadbalancer_usermanaged: false
 ins_mirror: https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp
-ins_occlient: "{{ ins_mirror }}/{{ ins_version }}/openshift-client-linux-{{ ins_version }}.tar.gz"
+ins_occlient: >-
+  {{
+    ins_mirror
+    ~ '/' ~ ins_version
+    ~ '/openshift-client-linux-' ~ ins_version ~ '.tar.gz'
+  }}
 ins_download_url: quay.io/openshift-release-dev/ocp-release
 ins_machine_network:
 ins_service_network: 172.30.0.0/16
@@ -38,8 +44,20 @@ ins_registry: false
 ins_root_ca:
 ins_ca_o:
 ins_additional_trust_bundle: ''
-ins_api_vip: "{{ lookup('community.general.dig', 'api.' ~ ins_cluster_name ~ '.' ~ ins_base_domain) }}"
-ins_apps_vip: "{{ lookup('community.general.dig', 'wildcard.apps.' ~ ins_cluster_name ~ '.' ~ ins_base_domain) }}"
+ins_api_vip: >-
+  {{
+    lookup(
+      'community.general.dig',
+      'api.' ~ ins_cluster_name ~ '.' ~ ins_base_domain
+    )
+  }}
+ins_apps_vip: >-
+  {{
+    lookup(
+      'community.general.dig',
+      'wildcard.apps.' ~ ins_cluster_name ~ '.' ~ ins_base_domain
+    )
+  }}
 ins_ifname: ens192
 ins_gateway:
 ins_dns_servers:

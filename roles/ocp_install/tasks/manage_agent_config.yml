@@ -81,8 +81,10 @@
       ansible.builtin.shell:
         cmd: |
           set -o pipefail
-          export PATH="$HOME/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-          ./openshift-install agent create image --dir {{ ins_cluster_sub_dirs.config }}
+          export PATH="$HOME/.local/bin:/usr/local/sbin:/usr/local/bin"
+          export PATH="$PATH:/usr/sbin:/usr/bin:/sbin:/bin"
+          ./openshift-install agent create image \
+            --dir {{ ins_cluster_sub_dirs.config }}
       args:
         chdir: "{{ ins_cluster_sub_dirs.download }}"
         executable: /bin/bash
