@@ -1,15 +1,15 @@
 ---
 - name: Retrieve current secret from Hashicorp Vault
-  delegate_to: "{{ ins_delegate_to }}"
+  delegate_to: "{{ ocp_install_delegate_to }}"
   run_once: true
   community.hashi_vault.vault_kv2_get:
     url: "{{ vault_address }}"
-    engine_mount_point: "{{ ins_engine_mount_point }}"
-    path: "{{ ins_vault_path }}/install"
-    auth_method: "{{ ins_hashi_vault_auth_method }}"
+    engine_mount_point: "{{ ocp_install_engine_mount_point }}"
+    path: "{{ ocp_install_vault_path }}/install"
+    auth_method: "{{ ocp_install_hashi_vault_auth_method }}"
     role_id: "{{ ansible_hashi_vault_role_id | default('') }}"
     secret_id: "{{ ansible_hashi_vault_secret_id | default('') }}"
-    validate_certs: "{{ ins_hashi_vault_validate_certs }}"
+    validate_certs: "{{ ocp_install_hashi_vault_validate_certs }}"
   register: current
   no_log: true
 
@@ -26,15 +26,15 @@
       or current.secret.password == ''
   block:
     - name: Read kubeconfig
-      delegate_to: "{{ ins_delegate_to }}"
+      delegate_to: "{{ ocp_install_delegate_to }}"
       run_once: true
       ansible.builtin.slurp:
-        src: "{{ ins_cluster_sub_dirs.config }}/auth/kubeconfig"
+        src: "{{ ocp_install_cluster_sub_dirs.config }}/auth/kubeconfig"
       register: kubeconfig_slurp
       no_log: true
 
     - name: Set kubeconfig with internal Root CA
-      delegate_to: "{{ ins_delegate_to }}"
+      delegate_to: "{{ ocp_install_delegate_to }}"
       run_once: true
       ansible.builtin.set_fact:
         kubeconfig_with_custom_ca: >-
@@ -42,20 +42,20 @@
             (kubeconfig_slurp.content | b64decode)
             | regex_replace(
               'certificate-authority-data: .*',
-              'certificate-authority-data: ' + (ins_root_ca | b64encode)
+              'certificate-authority-data: ' + (ocp_install_root_ca | b64encode)
             )
           }}
 
     - name: Read kubeadmin
-      delegate_to: "{{ ins_delegate_to }}"
+      delegate_to: "{{ ocp_install_delegate_to }}"
       run_once: true
       ansible.builtin.slurp:
-        src: "{{ ins_cluster_sub_dirs.config }}/auth/kubeadmin-password"
+        src: "{{ ocp_install_cluster_sub_dirs.config }}/auth/kubeadmin-password"
       register: kubeadmin_slurp
       no_log: true
 
     - name: Write kubeconfig and password to vault
-      delegate_to: "{{ ins_delegate_to }}"
+      delegate_to: "{{ ocp_install_delegate_to }}"
       run_once: true
       vars:
         values_to_update:
@@ -64,12 +64,12 @@
           password: "{{ kubeadmin_slurp['content'] | b64decode }}"
       community.hashi_vault.vault_kv2_write:
         url: "{{ vault_address }}"
-        engine_mount_point: "{{ ins_engine_mount_point }}"
-        path: "{{ ins_vault_path }}/install"
-        auth_method: "{{ ins_hashi_vault_auth_method }}"
+        engine_mount_point: "{{ ocp_install_engine_mount_point }}"
+        path: "{{ ocp_install_vault_path }}/install"
+        auth_method: "{{ ocp_install_hashi_vault_auth_method }}"
         role_id: "{{ ansible_hashi_vault_role_id | default('') }}"
         secret_id: "{{ ansible_hashi_vault_secret_id | default('') }}"
-        validate_certs: "{{ ins_hashi_vault_validate_certs }}"
+        validate_certs: "{{ ocp_install_hashi_vault_validate_certs }}"
         data: >-
           {{
             current.secret

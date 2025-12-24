@@ -4,7 +4,7 @@ metadata:
   name: default
 spec:
   {{ item.spec }}:
-{% for mirror in ins_image_tag_mirrors %}
+{% for mirror in ocp_install_image_tag_mirrors %}
     - mirrors:
       - {{ mirror.destination }}
       source: {{ mirror.source }}

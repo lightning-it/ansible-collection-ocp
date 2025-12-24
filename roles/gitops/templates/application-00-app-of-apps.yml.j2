@@ -10,11 +10,11 @@ spec:
   project: default
   source:
     path: .
-    repoURL: "{{ git_git_repo_url }}/app-of-apps.git"
-    targetRevision: "{{ git_target_revision }}"
+    repoURL: "{{ gitops_git_repo_url }}/app-of-apps.git"
+    targetRevision: "{{ gitops_target_revision }}"
     helm:
       valueFiles:
-{% for vf in git_value_files %}
+{% for vf in gitops_value_files %}
         - {{ vf }}
 {% endfor %}
   syncPolicy:

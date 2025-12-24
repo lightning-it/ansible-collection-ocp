@@ -29,7 +29,7 @@ spec:
     - emptyDir: {}
       name: policy-generator
   resourceTrackingMethod: annotation
-  applicationInstanceLabelKey: "{{ git_app_instance_label_key }}"
+  applicationInstanceLabelKey: "{{ gitops_app_instance_label_key }}"
   server:
     host: openshift-gitops-server-openshift-gitops.apps.{{ cluster_id }}.{{ base_domain }}
     route:

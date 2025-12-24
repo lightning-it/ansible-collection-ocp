@@ -21,10 +21,14 @@ tags:
   - day2
   - automation
   - devops
+  - infrastructure
 
 dependencies:
   ansible.posix: "*"
   kubernetes.core: "*"
+  community.hashi_vault: "*"
+  community.crypto: "*"
+  community.vmware: "*"
 
 build_ignore:
   - node_modules

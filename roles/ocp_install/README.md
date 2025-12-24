@@ -10,20 +10,20 @@ Automates an agent-based OpenShift Container Platform deployment: it prepares co
   roles:
     - role: lit.foundation_services.ocp_install
       vars:
-        ins_cluster_name: demo
-        ins_base_domain: corp.example.com
-        ins_delegate_to: localhost
-        ins_machine_network: 10.10.0.0/23
-        ins_vsphere: true
-        ins_vcenter_hostname: vcsa.corp.example.com
-        ins_vcenter_username: administrator@vsphere.local
-        ins_vcenter_password: "{{ lookup('env','VSPHERE_PASSWORD') }}"
-        ins_pullsecret_lookup: secret=platform/data/demo/install:pullsecret
+        ocp_install_cluster_name: demo
+        ocp_install_base_domain: corp.example.com
+        ocp_install_delegate_to: localhost
+        ocp_install_machine_network: 10.10.0.0/23
+        ocp_install_vsphere: true
+        ocp_install_vcenter_hostname: vcsa.corp.example.com
+        ocp_install_vcenter_username: administrator@vsphere.local
+        ocp_install_vcenter_password: "{{ lookup('env','VSPHERE_PASSWORD') }}"
+        ocp_install_pullsecret_lookup: secret=platform/data/demo/install:pullsecret
 ```
 
 ## Variables
 
-- `ins_*`: core installation inputs covering cluster identity (`ins_cluster_name`, `ins_base_domain`, `ins_version`), topology/networking (`ins_machine_network`, `ins_gateway`, `ins_dns_servers`, `ins_ifname`), and image/pull secret data.
-- vSphere-specific variables (`ins_vsphere`, `ins_vcenter_*`, `ins_vsphere_datacenter`, `ins_vsphere_network`, etc.) drive VM provisioning when targeting VMware.
-- Vault integration relies on `ins_hashi_vault_auth_method`, `ins_engine_mount_point`, and lookup strings (`ins_pullsecret_lookup`, `g_root_ca_lookup`, etc.).
-- Tags such as `ins_post` and `ins_infra` let you rerun post-install steps or infra/app-node configuration independently.
+- `ocp_install_*`: core installation inputs covering cluster identity (`ocp_install_cluster_name`, `ocp_install_base_domain`, `ocp_install_version`), topology/networking (`ocp_install_machine_network`, `ocp_install_gateway`, `ocp_install_dns_servers`, `ocp_install_ifname`), and image/pull secret data.
+- vSphere-specific variables (`ocp_install_vsphere`, `ocp_install_vcenter_*`, `ocp_install_vsphere_datacenter`, `ocp_install_vsphere_network`, etc.) drive VM provisioning when targeting VMware.
+- Vault integration relies on `ocp_install_hashi_vault_auth_method`, `ocp_install_engine_mount_point`, and lookup strings (`ocp_install_pullsecret_lookup`, `g_root_ca_lookup`, etc.).
+- Tags such as `ocp_install_post` and `ocp_install_infra` let you rerun post-install steps or infra/app-node configuration independently.

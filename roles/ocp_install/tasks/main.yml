@@ -6,28 +6,28 @@
 
 - name: Fetch values from Vault or fallback
   ansible.builtin.set_fact:
-    ins_additional_trust_bundle: >-
+    ocp_install_additional_trust_bundle: >-
       {{
         lookup(
           'community.hashi_vault.hashi_vault',
           g_root_ca_lookup,
-          default=ins_additional_trust_bundle
+          default=ocp_install_additional_trust_bundle
         )
       }}
-    ins_root_ca: >-
+    ocp_install_root_ca: >-
       {{
         lookup(
           'community.hashi_vault.hashi_vault',
           g_root_ca_lookup,
-          default=ins_root_ca
+          default=ocp_install_root_ca
         )
       }}
-    ins_pullsecret: >-
+    ocp_install_pullsecret: >-
       {{
         lookup(
           'community.hashi_vault.hashi_vault',
-          ins_pullsecret_lookup,
-          default=ins_pullsecret
+          ocp_install_pullsecret_lookup,
+          default=ocp_install_pullsecret
         )
       }}
   no_log: true
@@ -35,21 +35,21 @@
     - always
 
 - name: Retrieve current secret from Hashicorp Vault1
-  delegate_to: "{{ ins_delegate_to }}"
+  delegate_to: "{{ ocp_install_delegate_to }}"
   run_once: true
   community.hashi_vault.vault_kv2_get:
     url: "{{ vault_address }}"
-    engine_mount_point: "{{ ins_engine_mount_point }}"
-    path: "{{ ins_vault_path }}/install"
-    auth_method: "{{ ins_hashi_vault_auth_method }}"
+    engine_mount_point: "{{ ocp_install_engine_mount_point }}"
+    path: "{{ ocp_install_vault_path }}/install"
+    auth_method: "{{ ocp_install_hashi_vault_auth_method }}"
     role_id: "{{ ansible_hashi_vault_role_id | default('') }}"
     secret_id: "{{ ansible_hashi_vault_secret_id | default('') }}"
-    validate_certs: "{{ ins_hashi_vault_validate_certs }}"
+    validate_certs: "{{ ocp_install_hashi_vault_validate_certs }}"
   register: current
   no_log: true
 
 - name: Install OCP
-  delegate_to: "{{ ins_delegate_to }}"
+  delegate_to: "{{ ocp_install_delegate_to }}"
   run_once: true
   when:
     - current.secret.password is not defined or current.secret.password == ''
@@ -77,8 +77,8 @@
 
 - name: Post Install
   ansible.builtin.include_tasks: post_ocp.yml
-  tags: ins_post
+  tags: ocp_install_post
 
 - name: Setup Infra and App Nodes
   ansible.builtin.import_tasks: setup_nodes.yml
-  tags: ins_infra
+  tags: ocp_install_infra
