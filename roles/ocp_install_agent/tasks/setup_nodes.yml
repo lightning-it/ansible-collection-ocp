@@ -5,7 +5,7 @@
     - always
 
 - name: Label infra nodes
-  delegate_to: "{{ ins_delegate_to }}"
+  delegate_to: "{{ ocp_install_delegate_to }}"
   run_once: true
   kubernetes.core.k8s:
     state: present
@@ -17,11 +17,11 @@
         labels:
           node-role.kubernetes.io/infra: ""
       spec:
-        taints: "{{ ins_taints_ocs }}"
+        taints: "{{ ocp_install_taints_ocs }}"
   loop: "{{ groups['infra'] }}"
 
 - name: Set topology and storage label for infra nodes
-  delegate_to: "{{ ins_delegate_to }}"
+  delegate_to: "{{ ocp_install_delegate_to }}"
   run_once: true
   kubernetes.core.k8s:
     state: patched
@@ -37,10 +37,10 @@
   loop: "{{ groups['infra'] }}"
   loop_control:
     index_var: my_index
-  when: ins_odf
+  when: ocp_install_odf
 
 - name: Label worker nodes as app nodes
-  delegate_to: "{{ ins_delegate_to }}"
+  delegate_to: "{{ ocp_install_delegate_to }}"
   run_once: true
   kubernetes.core.k8s:
     state: present
@@ -54,7 +54,7 @@
   loop: "{{ groups['compute'] }}"
 
 - name: Set tolerations for ingress controller
-  delegate_to: "{{ ins_delegate_to }}"
+  delegate_to: "{{ ocp_install_delegate_to }}"
   run_once: true
   kubernetes.core.k8s:
     state: present
@@ -69,5 +69,5 @@
           nodeSelector:
             matchLabels:
               node-role.kubernetes.io/infra: ""
-          tolerations: "{{ ins_taints_ocs }}"
+          tolerations: "{{ ocp_install_taints_ocs }}"
         replicas: 3

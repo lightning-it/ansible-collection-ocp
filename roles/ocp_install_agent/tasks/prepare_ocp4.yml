@@ -1,0 +1,78 @@
+---
+- name: Create necessary directories
+  delegate_to: "{{ ocp_install_delegate_to }}"
+  run_once: true
+  ansible.builtin.file:
+    path: "{{ item.value }}"
+    state: directory
+    mode: "0775"
+    recurse: true
+  loop: "{{ ocp_install_cluster_sub_dirs | dict2items }}"
+  tags:
+    - always
+
+- name: Create a directory ~/.docker
+  delegate_to: "{{ ocp_install_delegate_to }}"
+  run_once: true
+  ansible.builtin.file:
+    path: "$HOME/.docker/"
+    state: directory
+    mode: '0700'
+  tags:
+    - always
+
+- name: Create ~/.docker/config.json
+  delegate_to: "{{ ocp_install_delegate_to }}"
+  run_once: true
+  ansible.builtin.copy:
+    content: "{{ ocp_install_pullsecret }}"
+    # content: "{{ ocp_install_pullsecret | replace(\"'\", '') }}"
+    dest: "$HOME/.docker/config.json"
+    mode: '0644'
+  tags:
+    - always
+
+- name: Download oc client tools
+  delegate_to: "{{ ocp_install_delegate_to }}"
+  run_once: true
+  ansible.builtin.get_url:
+    url: "{{ ocp_install_occlient }}"
+    dest: "{{ ocp_install_cluster_sub_dirs.download }}"
+    mode: '0644'
+
+- name: Unarchive ocp tools
+  delegate_to: "{{ ocp_install_delegate_to }}"
+  run_once: true
+  environment:
+    no_proxy: "{{ ocp_install_no_proxy | default('', true) }}"
+    http_proxy: "{{ ocp_install_proxy_url | default('', true) }}"
+    https_proxy: "{{ ocp_install_proxy_url | default('', true) }}"
+  ansible.builtin.unarchive:
+    src: "{{ item }}"
+    dest: "{{ ocp_install_cluster_sub_dirs.bin }}"
+    remote_src: true
+  vars:
+    _ocp_install_occlient_file: >-
+      {{ ocp_install_cluster_sub_dirs.download }}/{{ ocp_install_occlient | basename }}
+  loop:
+    - "{{ _ocp_install_occlient_file }}"
+  changed_when: false
+
+- name: Extract openshift-install
+  delegate_to: "{{ ocp_install_delegate_to }}"
+  run_once: true
+  environment:
+    no_proxy: "{{ ocp_install_no_proxy | default('', true) }}"
+    http_proxy: "{{ ocp_install_proxy_url | default('', true) }}"
+    https_proxy: "{{ ocp_install_proxy_url | default('', true) }}"
+  ansible.builtin.command:
+    cmd: >-
+      {{ ocp_install_cluster_sub_dirs.bin }}/oc adm release extract
+      --command="openshift-install"
+      --command-os="{{ ocp_install_os }}"
+      "{{ ocp_install_download_url }}:{{ ocp_install_version }}-{{ ocp_install_arch }}"
+      --to="{{ ocp_install_cluster_sub_dirs.download }}/"
+      --registry-config="$HOME/.docker/config.json"
+  register: openshift_install
+  changed_when: openshift_install.rc == 0
+  tags: extract_ocp_install

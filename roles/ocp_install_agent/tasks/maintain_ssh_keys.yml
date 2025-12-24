@@ -1,21 +1,21 @@
 ---
 - name: Retrieve current secret from Hashicorp Vault
-  delegate_to: "{{ ins_delegate_to }}"
+  delegate_to: "{{ ocp_install_delegate_to }}"
   run_once: true
   community.hashi_vault.vault_kv2_get:
     url: "{{ vault_address }}"
-    engine_mount_point: "{{ ins_engine_mount_point }}"
-    path: "{{ ins_vault_path }}/install"
-    auth_method: "{{ ins_hashi_vault_auth_method }}"
+    engine_mount_point: "{{ ocp_install_engine_mount_point }}"
+    path: "{{ ocp_install_vault_path }}/install"
+    auth_method: "{{ ocp_install_hashi_vault_auth_method }}"
     role_id: "{{ ansible_hashi_vault_role_id | default('') }}"
     secret_id: "{{ ansible_hashi_vault_secret_id | default('') }}"
-    validate_certs: "{{ ins_hashi_vault_validate_certs }}"
+    validate_certs: "{{ ocp_install_hashi_vault_validate_certs }}"
   register: current
   no_log: true
 
-- name: Add ssh pubkey to ins_ssh_pub_keys
+- name: Add ssh pubkey to ocp_install_ssh_pub_keys
   ansible.builtin.set_fact:
-    ins_ssh_pub_keys: "{{ ins_ssh_pub_keys + [current.secret.ssh_pub] }}"
+    ocp_install_ssh_pub_keys: "{{ ocp_install_ssh_pub_keys + [current.secret.ssh_pub] }}"
   when:
     - current.secret.ssh_pub is defined
     - current.secret.ssh_pub | length > 0
@@ -26,29 +26,29 @@
     - current.secret.ssh_pub is not defined
   block:
     - name: Create local temporary ssh directory
-      delegate_to: "{{ ins_delegate_to }}"
+      delegate_to: "{{ ocp_install_delegate_to }}"
       run_once: true
       ansible.builtin.tempfile:
         state: directory
       register: _ssh_tempdir
 
-    - name: Generate new ssh ed25519 key for {{ ins_cluster_name }}
-      delegate_to: "{{ ins_delegate_to }}"
+    - name: Generate new ssh ed25519 key for {{ ocp_install_cluster_name }}
+      delegate_to: "{{ ocp_install_delegate_to }}"
       run_once: true
       community.crypto.openssh_keypair:
         type: ed25519
         path: "{{ _ssh_tempdir.path }}/id_ed25519"
-        comment: "core@{{ ins_cluster_name }}"
+        comment: "core@{{ ocp_install_cluster_name }}"
 
     - name: Read root ssh key
-      delegate_to: "{{ ins_delegate_to }}"
+      delegate_to: "{{ ocp_install_delegate_to }}"
       run_once: true
       ansible.builtin.slurp:
         src: "{{ _ssh_tempdir.path }}/id_ed25519.pub"
       register: _ssh_key_results
 
     - name: Write ssh private and public key to vault
-      delegate_to: "{{ ins_delegate_to }}"
+      delegate_to: "{{ ocp_install_delegate_to }}"
       run_once: true
       vars:
         _ssh_key_path: "{{ _ssh_tempdir.path }}/id_ed25519"
@@ -58,12 +58,12 @@
           ssh_pub: "{{ lookup('file', _ssh_pub_path, rstrip=False) }}"
       community.hashi_vault.vault_kv2_write:
         url: "{{ vault_address }}"
-        engine_mount_point: "{{ ins_engine_mount_point }}"
-        path: "{{ ins_vault_path }}/install"
-        auth_method: "{{ ins_hashi_vault_auth_method }}"
+        engine_mount_point: "{{ ocp_install_engine_mount_point }}"
+        path: "{{ ocp_install_vault_path }}/install"
+        auth_method: "{{ ocp_install_hashi_vault_auth_method }}"
         role_id: "{{ ansible_hashi_vault_role_id | default('') }}"
         secret_id: "{{ ansible_hashi_vault_secret_id | default('') }}"
-        validate_certs: "{{ ins_hashi_vault_validate_certs }}"
+        validate_certs: "{{ ocp_install_hashi_vault_validate_certs }}"
         data: >-
           {{
             current.secret
@@ -71,18 +71,18 @@
           }}
       no_log: true
 
-    - name: Add ssh pubkey to ins_ssh_pub_keys
+    - name: Add ssh pubkey to ocp_install_ssh_pub_keys
       vars:
         _ssh_pub_path: "{{ _ssh_tempdir.path }}/id_ed25519.pub"
       ansible.builtin.set_fact:
-        ins_ssh_pub_keys: >-
+        ocp_install_ssh_pub_keys: >-
           {{
-            ins_ssh_pub_keys
+            ocp_install_ssh_pub_keys
             + [lookup('file', _ssh_pub_path, rstrip=False)]
           }}
 
     - name: Remove ssh temporary directory (delete ssh private key file)
-      delegate_to: "{{ ins_delegate_to }}"
+      delegate_to: "{{ ocp_install_delegate_to }}"
       run_once: true
       ansible.builtin.file:
         path: "{{ _ssh_tempdir.path }}"

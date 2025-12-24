@@ -3,7 +3,7 @@
   module_defaults:
     group/vmware: "{{ vvs_module_defaults_vmware_group }}"
     community.vmware.vmware_guest: "{{ vvs_module_defaults_vmware_guest }}"
-  delegate_to: "{{ ins_delegate_to }}"
+  delegate_to: "{{ ocp_install_delegate_to }}"
   run_once: true
   community.vmware.vmware_guest_powerstate:
     state: powered-on
@@ -14,4 +14,4 @@
     - "{{ groups['compute'] }}"
   async: 20
   poll: 0
-  when: ins_vsphere | bool
+  when: ocp_install_vsphere | bool

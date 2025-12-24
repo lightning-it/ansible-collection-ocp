@@ -1,0 +1,13 @@
+---
+- name: Install OCP via agent-based workflow
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    ocp_install_method: agent
+    ocp_install_cluster_name: demo-ocp
+    ocp_install_base_domain: dev.l-it.io
+
+  roles:
+    - role: lit.ocp.ocp_install

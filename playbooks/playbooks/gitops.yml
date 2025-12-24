@@ -1,0 +1,12 @@
+---
+- name: Configure OpenShift GitOps
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    gitops_operator_state: present
+    gitops_operator_channel: gitops-1.18
+
+  roles:
+    - role: lit.ocp.gitops

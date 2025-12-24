@@ -1,18 +1,35 @@
 ---
-# Collection-level example playbook for lit.rhel
+# Collection-level example playbook for lit.ocp
 #
 # This playbook is used as the "canonical" example entrypoint in CI
-# and for users who want to see how to apply the foundational roles.
+# and for users who want to see how to apply the OCP roles.
 
-- name: RHEL foundational baseline example
+- name: OCP baseline example
   hosts: localhost
   connection: local
   gather_facts: false
 
   roles:
-    - role: lit.rhel.selinux
+    - role: lit.ocp.ocp_install
       vars:
-        selinux_state: enforcing
-        selinux_policy: targeted
-        selinux_manage_config: false
-        selinux_fail_if_kernel_disabled: false
+        ocp_install_method: agent
+        ocp_install_cluster_name: demo-ocp-agent
+        ocp_install_base_domain: dev.l-it.io
+        # plus ocp_install_agent_* vars
+
+    - role: lit.ocp.ocp_install
+      vars:
+        ocp_install_method: upi
+        ocp_install_cluster_name: demo-ocp-upi
+        ocp_install_base_domain: dev.l-it.io
+        # plus ocp_install_upi_* vars (currently stub)
+
+    - role: lit.ocp.gitops
+      vars:
+        gitops_operator_state: present
+        gitops_operator_channel: gitops-1.18
+
+    - role: lit.ocp.ocp_manage_operator
+      vars:
+        ocp_manage_operator_name: example-operator
+        ocp_manage_operator_namespace: openshift-operators

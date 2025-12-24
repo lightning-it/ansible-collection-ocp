@@ -1,0 +1,24 @@
+---
+- name: Test required values for platform vsphere
+  ansible.builtin.assert:
+    that:
+      - ocp_install_api_vip | length > 0
+      - ocp_install_apps_vip | length > 0
+      - ocp_install_vcenter_hostname | length > 0
+      - ocp_install_vcenter_password | length > 0
+      - ocp_install_vcenter_username | length > 0
+      - ocp_install_vsphere_cluster | length > 0
+      - ocp_install_vsphere_datacenter | length > 0
+      - vvs_vmware_iso_datastore | length > 0
+      - ocp_install_vsphere_network | length > 0
+  when: ocp_install_platform == 'vsphere'
+
+- name: Test required values for OCP
+  ansible.builtin.assert:
+    that:
+      - ocp_install_base_domain | length > 0
+      - ocp_install_cluster_name | length > 0
+      - ocp_install_gateway | length > 0
+      - ocp_install_gateway | length > 0
+      - ocp_install_dns_servers | length > 0
+      - ocp_install_ca_o | length > 0

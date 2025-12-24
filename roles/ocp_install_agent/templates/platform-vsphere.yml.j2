@@ -1,0 +1,31 @@
+vsphere:
+{% if ocp_install_loadbalancer_usermanaged | bool %}
+  loadBalancer:
+    type: UserManaged
+{% endif %}
+  apiVIPs:
+    - {{ ocp_install_api_vip }}
+  failureDomains:
+    - name: generated-failure-domain
+      region: generated-region
+      server: {{ ocp_install_vcenter_hostname }}
+      topology:
+        computeCluster: /{{ ocp_install_vsphere_datacenter }}/host/{{ ocp_install_vsphere_cluster }}
+        datacenter: {{ ocp_install_vsphere_datacenter }}
+        datastore: /{{ ocp_install_vsphere_datacenter }}/datastore/{{ vvs_vmware_iso_datastore }}
+        folder: {{ vvs_folder_full_path }}
+        networks:
+          - {{ ocp_install_vsphere_network }}
+{% if ocp_install_vsphere_resource_pool is defined %}
+        resourcePool: /{{ ocp_install_vsphere_datacenter }}/host/{{ ocp_install_vsphere_cluster }}/Resources/{{ ocp_install_vsphere_resource_pool }}
+{% endif %}
+      zone: generated-zone
+  ingressVIPs:
+    - {{ ocp_install_apps_vip }}
+  vcenters:
+    - datacenters:
+        - {{ ocp_install_vsphere_datacenter }}
+      server: {{ ocp_install_vcenter_hostname }}
+      port: 443
+      user: {{ ocp_install_vcenter_username }}
+      password: {{ ocp_install_vcenter_password }}

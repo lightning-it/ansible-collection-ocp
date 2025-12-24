@@ -4,11 +4,11 @@ kind: AgentConfig
 metadata:
   name: {{ cluster_id }}
 rendezvousIP: {{ lookup('dig',groups['control'][0]) }}
-{% if ins_ntp_servers is defined %}
-AdditionalNTPSources: {{ ins_ntp_servers | map(attribute='hostname') | list }}
+{% if ocp_install_ntp_servers is defined %}
+AdditionalNTPSources: {{ ocp_install_ntp_servers | map(attribute='hostname') | list }}
 {% endif %}
 hosts:
-{% for node in ins_create_vms_agent_based_vminfo %}
+{% for node in ocp_install_create_vms_agent_based_vminfo %}
   - hostname: {{ node.item  }}
 {% if 'control' in node.item or "etc" in node.item %}
     role: master
@@ -16,27 +16,27 @@ hosts:
     role: worker
 {% endif %}
     interfaces:
-    - name: {{ ins_ifname }}
+    - name: {{ ocp_install_ifname }}
       macAddress: {{ node.instance.hw_eth0.macaddress }}
     networkConfig:
       interfaces:
-      - name: {{ ins_ifname }}
+      - name: {{ ocp_install_ifname }}
         type: ethernet
         state: up
         ipv4:
           enabled: true
           address:
             - ip: {{ lookup('dig', node.item) }}
-              prefix-length: {{ ins_netmask_prefix }}
+              prefix-length: {{ ocp_install_netmask_prefix }}
           dhcp: false
         ipv6:
           enabled: false
       dns-resolver:
         config:
-          server: {{ ins_dns_servers }}
+          server: {{ ocp_install_dns_servers }}
       routes:
         config:
           - destination: 0.0.0.0/0
-            next-hop-address: {{ ins_gateway }}
-            next-hop-interface: {{ ins_ifname }}
+            next-hop-address: {{ ocp_install_gateway }}
+            next-hop-interface: {{ ocp_install_ifname }}
 {% endfor %}

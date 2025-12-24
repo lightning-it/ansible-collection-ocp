@@ -1,0 +1,5 @@
+---
+ocp_install_cluster_sub_dirs:
+  download: "{{ ocp_install_dir }}/ocp/downloads"
+  config: "{{ ocp_install_dir }}/ocp/config"
+  bin: "$HOME/.local/bin"

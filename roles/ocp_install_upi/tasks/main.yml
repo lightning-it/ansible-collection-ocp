@@ -1,0 +1,6 @@
+---
+- name: UPI install not yet implemented
+  ansible.builtin.fail:
+    msg: >-
+      ocp_install_method=upi selected, but UPI implementation is not yet available.
+      Please use ocp_install_method=agent until UPI support is added.

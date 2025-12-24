@@ -1,0 +1,84 @@
+---
+# general config
+ocp_install_delegate_to: localhost
+ocp_install_dir: /root
+ocp_install_platform: vsphere
+ocp_install_kubeconfig_dir: '~/.kube'
+
+# vsphere config
+ocp_install_vsphere: true
+ocp_install_vcenter_hostname:
+ocp_install_vcenter_password:
+ocp_install_vcenter_username:
+ocp_install_vsphere_cluster:
+ocp_install_vsphere_datacenter:
+ocp_install_vsphere_network:
+
+# ocp config
+ocp_install_base_domain: ''
+ocp_install_cluster_name:
+ocp_install_vault_path: >-
+  {{ cluster_id[8:11] }}/{{ cluster_id[11:14] }}/{{ cluster_id }}
+ocp_install_version: 4.18.13
+ocp_install_os: linux
+ocp_install_arch: x86_64
+ocp_install_loadbalancer_usermanaged: false
+ocp_install_mirror: >-
+  https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp
+ocp_install_occlient: >-
+  {{
+    ocp_install_mirror
+    ~ '/' ~ ocp_install_version
+    ~ '/openshift-client-linux-' ~ ocp_install_version ~ '.tar.gz'
+  }}
+ocp_install_download_url: quay.io/openshift-release-dev/ocp-release
+ocp_install_machine_network:
+ocp_install_service_network: 172.30.0.0/16
+ocp_install_pod_network: 10.128.0.0/14
+ocp_install_proxy: false
+ocp_install_proxy_url:
+ocp_install_no_proxy:
+ocp_install_pullsecret: ''
+ocp_install_registry_quayio:
+ocp_install_ssh_pub_keys: []
+ocp_install_registry: false
+ocp_install_root_ca:
+ocp_install_ca_o:
+ocp_install_additional_trust_bundle: ''
+ocp_install_api_vip: >-
+  {{
+    lookup(
+      'community.general.dig',
+      'api.' ~ ocp_install_cluster_name ~ '.' ~ ocp_install_base_domain
+    )
+  }}
+ocp_install_apps_vip: >-
+  {{
+    lookup(
+      'community.general.dig',
+      'wildcard.apps.'
+      ~ ocp_install_cluster_name
+      ~ '.'
+      ~ ocp_install_base_domain
+    )
+  }}
+ocp_install_ifname: ens192
+ocp_install_gateway:
+ocp_install_dns_servers:
+ocp_install_netmask_prefix: >-
+  {{
+    ocp_install_machine_network
+    | ansible.utils.ipaddr('prefix')
+  }}
+ocp_install_image_tag_mirrors: {}
+ocp_install_taints_ocs:
+  - effect: NoSchedule
+    key: node.ocs.openshift.io/storage
+    value: "true"
+ocp_install_odf: true
+
+# hashicorp config
+ocp_install_engine_mount_point: infra-secrets
+ocp_install_hashi_vault_auth_method: approle
+ocp_install_cluster_kubeconfig_vault_key: kubeconfig_CA
+ocp_install_hashi_vault_validate_certs: true
