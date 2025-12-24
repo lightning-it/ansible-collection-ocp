@@ -1,0 +1,5 @@
+---
+# UPI-specific defaults (placeholder until UPI logic is implemented).
+ocp_install_upi_platform: ""
+ocp_install_upi_terraform_root: ""
+ocp_install_upi_ignition_outdir: ""

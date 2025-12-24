@@ -1,9 +1,9 @@
 ---
 galaxy_info:
-  role_name: ocp_install
+  role_name: ocp_install_agent
   namespace: lit
   author: Dirk Egert
-  description: Facade role dispatching to OCP install implementations.
+  description: Agent-based OpenShift installation.
   company: degert-it
   license: GPL-2.0-only
   min_ansible_version: "2.15"
