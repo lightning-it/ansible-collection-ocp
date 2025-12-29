@@ -2,6 +2,7 @@
 # Entrypoint for OCP installation. Dispatches to method-specific roles.
 # Supported methods: upi | agent
 ocp_install_method: agent
+ocp_install_skip: false
 
 # Common install inputs (shared across methods).
 ocp_install_cluster_name: ""

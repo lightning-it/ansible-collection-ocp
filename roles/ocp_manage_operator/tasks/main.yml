@@ -1,4 +1,8 @@
 ---
+- name: Skip operator management (test/stub mode)
+  ansible.builtin.meta: end_play
+  when: ocp_manage_operator_skip | bool
+
 - name: Debug {{ ocp_manage_operator_name }}
   ansible.builtin.debug:
     verbosity: 2

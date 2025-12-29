@@ -1,0 +1,8 @@
+---
+- name: Converge gitops
+  hosts: gitops
+  gather_facts: false
+  vars:
+    gitops_skip: true
+  roles:
+    - role: gitops

@@ -3,3 +3,4 @@
 ocp_install_upi_platform: ""
 ocp_install_upi_terraform_root: ""
 ocp_install_upi_ignition_outdir: ""
+ocp_install_upi_skip: false

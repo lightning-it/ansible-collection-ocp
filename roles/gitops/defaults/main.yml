@@ -1,4 +1,5 @@
 ---
+gitops_skip: false
 gitops_operator_state: present
 gitops_argocd_state: present
 gitops_approve: false
