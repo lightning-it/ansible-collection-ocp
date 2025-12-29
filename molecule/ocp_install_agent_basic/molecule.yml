@@ -9,6 +9,9 @@ platforms:
 
 provisioner:
   name: ansible
+  config_options:
+    defaults:
+      roles_path: ../../roles
   inventory:
     hosts:
       all:

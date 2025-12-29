@@ -1,7 +1,10 @@
+# ansible-lint: ignore=fqcn[keyword]
 ---
 - name: Converge gitops
   hosts: gitops
   gather_facts: false
+  collections:
+    - lit.ocp
   vars:
     gitops_skip: true
   roles:

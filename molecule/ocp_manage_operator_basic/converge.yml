@@ -1,7 +1,10 @@
+# ansible-lint: ignore=fqcn[keyword]
 ---
 - name: Converge ocp_manage_operator
   hosts: ocp_manage_operator
   gather_facts: false
+  collections:
+    - lit.ocp
   vars:
     ocp_manage_operator_skip: true
   roles:

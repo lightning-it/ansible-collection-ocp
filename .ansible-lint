@@ -3,3 +3,5 @@
 # vendored dependencies that may be present under collections/.
 exclude_paths:
   - collections/
+skip_list:
+  - fqcn[keyword]
