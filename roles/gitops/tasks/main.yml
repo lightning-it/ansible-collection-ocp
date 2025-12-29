@@ -1,4 +1,8 @@
 ---
+- name: Skip gitops role (test/stub mode)
+  ansible.builtin.meta: end_play
+  when: gitops_skip | bool
+
 - name: Manage gitops operator
   vars:
     ocp_manage_operator_name: "{{ gitops_operator_name }}"

@@ -50,7 +50,8 @@
   delegate_to: "{{ ocp_install_delegate_to }}"
   run_once: true
   ansible.builtin.copy:
-    content: "{{ vault_secret.data.data[ocp_install_cluster_kubeconfig_vault_key] }}"
+    content: >-
+      {{ vault_secret.data.data[ocp_install_cluster_kubeconfig_vault_key] }}
     dest: "{{ ocp_install_kubeconfig_dir }}/config"
     mode: '0644'
   tags:

@@ -53,7 +53,8 @@
     remote_src: true
   vars:
     _ocp_install_occlient_file: >-
-      {{ ocp_install_cluster_sub_dirs.download }}/{{ ocp_install_occlient | basename }}
+      {{ ocp_install_cluster_sub_dirs.download }}/
+      {{ ocp_install_occlient | basename }}
   loop:
     - "{{ _ocp_install_occlient_file }}"
   changed_when: false
@@ -70,7 +71,8 @@
       {{ ocp_install_cluster_sub_dirs.bin }}/oc adm release extract
       --command="openshift-install"
       --command-os="{{ ocp_install_os }}"
-      "{{ ocp_install_download_url }}:{{ ocp_install_version }}-{{ ocp_install_arch }}"
+      "{{ ocp_install_download_url }}:
+      {{ ocp_install_version }}-{{ ocp_install_arch }}"
       --to="{{ ocp_install_cluster_sub_dirs.download }}/"
       --registry-config="$HOME/.docker/config.json"
   register: openshift_install

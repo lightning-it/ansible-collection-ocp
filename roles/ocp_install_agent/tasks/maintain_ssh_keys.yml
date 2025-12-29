@@ -15,7 +15,8 @@
 
 - name: Add ssh pubkey to ocp_install_ssh_pub_keys
   ansible.builtin.set_fact:
-    ocp_install_ssh_pub_keys: "{{ ocp_install_ssh_pub_keys + [current.secret.ssh_pub] }}"
+    ocp_install_ssh_pub_keys: >-
+      {{ ocp_install_ssh_pub_keys + [current.secret.ssh_pub] }}
   when:
     - current.secret.ssh_pub is defined
     - current.secret.ssh_pub | length > 0

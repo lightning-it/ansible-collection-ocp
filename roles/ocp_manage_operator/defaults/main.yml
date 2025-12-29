@@ -1,4 +1,5 @@
 ---
+ocp_manage_operator_skip: false
 ocp_manage_operator_api_version: v1
 ocp_manage_operator_approve: true
 ocp_manage_operator_channel: stable
