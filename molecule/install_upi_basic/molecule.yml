@@ -3,7 +3,7 @@ driver:
   name: docker
 
 platforms:
-  - name: ocp_install_upi
+  - name: install_upi
     image: quay.io/rockylinux/rockylinux:9
     pre_build_image: true
 
@@ -16,7 +16,7 @@ provisioner:
     hosts:
       all:
         hosts:
-          ocp_install_upi:
+          install_upi:
             ansible_connection: docker
   playbooks:
     converge: converge.yml

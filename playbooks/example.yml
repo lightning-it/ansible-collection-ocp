@@ -24,7 +24,7 @@
         install_skip: true
         install_cluster_name: demo-ocp-upi
         install_base_domain: dev.l-it.io
-        # plus ocp_install_upi_* vars (currently stub)
+        # plus install_upi_* vars (currently stub)
 
     - role: lit.ocp.gitops_bootstrap
       vars:

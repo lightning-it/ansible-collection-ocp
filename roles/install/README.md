@@ -11,7 +11,7 @@ Front-door role for installing OpenShift in the `lit.ocp` collection. Dispatches
 - `install_ssh_pub_keys`: list of SSH public keys to embed.
 
 Method-specific variables live in the implementation roles:
-- `ocp_install_upi_*` for UPI
+- `install_upi_*` for UPI (legacy `ocp_install_upi_*` still accepted)
 - `install_agent_*` for agent-based installs
 
 ## Examples
@@ -27,7 +27,7 @@ Method-specific variables live in the implementation roles:
         install_method: upi
         install_cluster_name: demo-ocp
         install_base_domain: dev.l-it.io
-        # plus ocp_install_upi_* vars
+        # plus install_upi_* vars
 ```
 
 ```yaml

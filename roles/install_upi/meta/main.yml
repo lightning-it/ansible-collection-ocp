@@ -1,6 +1,6 @@
 ---
 galaxy_info:
-  role_name: ocp_install_upi
+  role_name: install_upi
   namespace: lit
   author: Dirk Egert
   company: Lightning IT

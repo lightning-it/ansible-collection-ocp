@@ -1,0 +1,21 @@
+---
+- name: Normalize legacy UPI variables
+  ansible.builtin.set_fact:
+    install_upi_skip: >-
+      {{ install_upi_skip | default(ocp_install_upi_skip) }}
+    install_upi_platform: >-
+      {{ install_upi_platform | default(ocp_install_upi_platform) }}
+    install_upi_terraform_root: >-
+      {{ install_upi_terraform_root | default(ocp_install_upi_terraform_root) }}
+    install_upi_ignition_outdir: >-
+      {{
+        install_upi_ignition_outdir
+        | default(ocp_install_upi_ignition_outdir)
+      }}
+
+- name: UPI install not yet implemented
+  ansible.builtin.fail:
+    msg: >-
+      install_method=upi selected, but UPI implementation is not yet
+      available. Please use install_method=agent until UPI support is added.
+  when: not install_upi_skip | bool

@@ -35,7 +35,7 @@
 
 - name: Include UPI-based install
   ansible.builtin.include_role:
-    name: lit.ocp.ocp_install_upi
+    name: lit.ocp.install_upi
   when: install_method == 'upi'
 
 - name: Include agent-based install

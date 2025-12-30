@@ -1,6 +1,6 @@
 ---
-- name: Verify ocp_install_upi
-  hosts: ocp_install_upi
+- name: Verify install_upi
+  hosts: install_upi
   gather_facts: false
   tasks:
     - name: Assert role executed
