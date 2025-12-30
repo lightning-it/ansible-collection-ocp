@@ -1,0 +1,9 @@
+---
+- name: Verify install_agent
+  hosts: install_agent
+  gather_facts: false
+  tasks:
+    - name: Assert role executed
+      ansible.builtin.assert:
+        that:
+          - true

@@ -1,0 +1,26 @@
+---
+driver:
+  name: docker
+
+platforms:
+  - name: install_agent
+    image: quay.io/rockylinux/rockylinux:9
+    pre_build_image: true
+
+provisioner:
+  name: ansible
+  config_options:
+    defaults:
+      roles_path: ../../roles
+  inventory:
+    hosts:
+      all:
+        hosts:
+          install_agent:
+            ansible_connection: docker
+  playbooks:
+    converge: converge.yml
+    verify: verify.yml
+
+verifier:
+  name: ansible

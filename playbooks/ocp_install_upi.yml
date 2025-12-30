@@ -5,9 +5,9 @@
   gather_facts: false
 
   vars:
-    ocp_install_method: upi
-    ocp_install_cluster_name: demo-ocp
-    ocp_install_base_domain: dev.l-it.io
+    install_method: upi
+    install_cluster_name: demo-ocp
+    install_base_domain: dev.l-it.io
 
   roles:
-    - role: lit.ocp.ocp_install
+    - role: lit.ocp.install

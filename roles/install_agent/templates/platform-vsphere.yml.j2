@@ -1,0 +1,31 @@
+vsphere:
+{% if install_agent_loadbalancer_usermanaged | bool %}
+  loadBalancer:
+    type: UserManaged
+{% endif %}
+  apiVIPs:
+    - {{ install_agent_api_vip }}
+  failureDomains:
+    - name: generated-failure-domain
+      region: generated-region
+      server: {{ install_agent_vcenter_hostname }}
+      topology:
+        computeCluster: /{{ install_agent_vsphere_datacenter }}/host/{{ install_agent_vsphere_cluster }}
+        datacenter: {{ install_agent_vsphere_datacenter }}
+        datastore: /{{ install_agent_vsphere_datacenter }}/datastore/{{ vvs_vmware_iso_datastore }}
+        folder: {{ vvs_folder_full_path }}
+        networks:
+          - {{ install_agent_vsphere_network }}
+{% if install_agent_vsphere_resource_pool is defined %}
+        resourcePool: /{{ install_agent_vsphere_datacenter }}/host/{{ install_agent_vsphere_cluster }}/Resources/{{ install_agent_vsphere_resource_pool }}
+{% endif %}
+      zone: generated-zone
+  ingressVIPs:
+    - {{ install_agent_apps_vip }}
+  vcenters:
+    - datacenters:
+        - {{ install_agent_vsphere_datacenter }}
+      server: {{ install_agent_vcenter_hostname }}
+      port: 443
+      user: {{ install_agent_vcenter_username }}
+      password: {{ install_agent_vcenter_password }}

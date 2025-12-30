@@ -1,10 +1,10 @@
 ---
 galaxy_info:
-  role_name: ocp_install_upi
+  role_name: install
   namespace: lit
   author: Dirk Egert
   company: Lightning IT
-  description: UPI-based OpenShift installation logic.
+  description: Facade role dispatching to OCP install implementations.
   license: GPL-2.0-only
   min_ansible_version: "2.15"
   platforms:

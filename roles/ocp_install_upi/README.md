@@ -1,6 +1,6 @@
-# ocp_install_upi
+# install_upi
 
-UPI-specific implementation for installing OpenShift (currently not implemented). The facade role `lit.ocp.ocp_install` will route here when `ocp_install_method: upi`.
+UPI-specific implementation for installing OpenShift (currently not implemented). The facade role `lit.ocp.install` will route here when `ocp_install_method: upi`.
 
 ## Status
 
@@ -19,7 +19,7 @@ UPI support is not yet available. The role currently fails fast with a clear mes
   connection: local
   gather_facts: false
   roles:
-    - role: lit.ocp.ocp_install
+    - role: lit.ocp.install
       vars:
         ocp_install_method: upi
         ocp_install_cluster_name: demo-ocp

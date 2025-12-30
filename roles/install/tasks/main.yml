@@ -1,0 +1,44 @@
+---
+- name: Normalize legacy variable names
+  ansible.builtin.set_fact:
+    install_method: >-
+      {{ install_method | default(ocp_install_method) }}
+    install_skip: >-
+      {{ install_skip | default(ocp_install_skip | default(false)) }}
+    install_cluster_name: >-
+      {{ install_cluster_name | default(ocp_install_cluster_name) }}
+    install_base_domain: >-
+      {{ install_base_domain | default(ocp_install_base_domain) }}
+    install_pullsecret: >-
+      {{ install_pullsecret | default(ocp_install_pullsecret) }}
+    install_ssh_pub_keys: >-
+      {{ install_ssh_pub_keys | default(ocp_install_ssh_pub_keys) }}
+
+- name: Validate install_method
+  ansible.builtin.assert:
+    that:
+      - install_method in ['upi', 'agent']
+    fail_msg: "install_method must be one of: 'upi', 'agent'."
+
+- name: Skip OCP install (test/stub mode)
+  ansible.builtin.meta: end_play
+  when: install_skip | bool
+
+- name: Expose shared variables for downstream roles
+  ansible.builtin.set_fact:
+    ocp_install_method: "{{ install_method }}"
+    ocp_install_skip: "{{ install_skip }}"
+    ocp_install_cluster_name: "{{ install_cluster_name }}"
+    ocp_install_base_domain: "{{ install_base_domain }}"
+    ocp_install_pullsecret: "{{ install_pullsecret }}"
+    ocp_install_ssh_pub_keys: "{{ install_ssh_pub_keys }}"
+
+- name: Include UPI-based install
+  ansible.builtin.include_role:
+    name: lit.ocp.ocp_install_upi
+  when: install_method == 'upi'
+
+- name: Include agent-based install
+  ansible.builtin.include_role:
+    name: lit.ocp.install_agent
+  when: install_method == 'agent'

@@ -2,22 +2,14 @@
 galaxy_info:
   author: Dirk Egert
   description: role to install/uninstall operator
-  company: degert-it
+  company: Lightning IT
   role_name: ocp_manage_operator
   namespace: default
-
-  license: BSD-3-Clause
+  license: GPL-2.0-only
   min_ansible_version: '2.1'
   galaxy_tags: []
   platforms:
     - name: EL
       versions:
         - all
-    - name: Debian
-      versions:
-        - all
-    - name: Ubuntu
-      versions:
-        - all
-
 dependencies: []

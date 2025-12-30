@@ -1,0 +1,80 @@
+---
+- name: Create necessary directories
+  delegate_to: "{{ install_agent_delegate_to }}"
+  run_once: true
+  ansible.builtin.file:
+    path: "{{ item.value }}"
+    state: directory
+    mode: "0775"
+    recurse: true
+  loop: "{{ install_agent_cluster_sub_dirs | dict2items }}"
+  tags:
+    - always
+
+- name: Create a directory ~/.docker
+  delegate_to: "{{ install_agent_delegate_to }}"
+  run_once: true
+  ansible.builtin.file:
+    path: "$HOME/.docker/"
+    state: directory
+    mode: '0700'
+  tags:
+    - always
+
+- name: Create ~/.docker/config.json
+  delegate_to: "{{ install_agent_delegate_to }}"
+  run_once: true
+  ansible.builtin.copy:
+    content: "{{ install_agent_pullsecret }}"
+    # content: "{{ install_agent_pullsecret | replace(\"'\", '') }}"
+    dest: "$HOME/.docker/config.json"
+    mode: '0644'
+  tags:
+    - always
+
+- name: Download oc client tools
+  delegate_to: "{{ install_agent_delegate_to }}"
+  run_once: true
+  ansible.builtin.get_url:
+    url: "{{ install_agent_occlient }}"
+    dest: "{{ install_agent_cluster_sub_dirs.download }}"
+    mode: '0644'
+
+- name: Unarchive ocp tools
+  delegate_to: "{{ install_agent_delegate_to }}"
+  run_once: true
+  environment:
+    no_proxy: "{{ install_agent_no_proxy | default('', true) }}"
+    http_proxy: "{{ install_agent_proxy_url | default('', true) }}"
+    https_proxy: "{{ install_agent_proxy_url | default('', true) }}"
+  ansible.builtin.unarchive:
+    src: "{{ item }}"
+    dest: "{{ install_agent_cluster_sub_dirs.bin }}"
+    remote_src: true
+  vars:
+    _install_agent_occlient_file: >-
+      {{ install_agent_cluster_sub_dirs.download }}/
+      {{ install_agent_occlient | basename }}
+  loop:
+    - "{{ _install_agent_occlient_file }}"
+  changed_when: false
+
+- name: Extract openshift-install
+  delegate_to: "{{ install_agent_delegate_to }}"
+  run_once: true
+  environment:
+    no_proxy: "{{ install_agent_no_proxy | default('', true) }}"
+    http_proxy: "{{ install_agent_proxy_url | default('', true) }}"
+    https_proxy: "{{ install_agent_proxy_url | default('', true) }}"
+  ansible.builtin.command:
+    cmd: >-
+      {{ install_agent_cluster_sub_dirs.bin }}/oc adm release extract
+      --command="openshift-install"
+      --command-os="{{ install_agent_os }}"
+      "{{ install_agent_download_url }}:
+      {{ install_agent_version }}-{{ install_agent_arch }}"
+      --to="{{ install_agent_cluster_sub_dirs.download }}/"
+      --registry-config="$HOME/.docker/config.json"
+  register: openshift_install
+  changed_when: openshift_install.rc == 0
+  tags: extract_ocp_install

@@ -10,20 +10,20 @@
   gather_facts: false
 
   roles:
-    - role: lit.ocp.ocp_install
+    - role: lit.ocp.install
       vars:
-        ocp_install_method: agent
-        ocp_install_skip: true
-        ocp_install_cluster_name: demo-ocp-agent
-        ocp_install_base_domain: dev.l-it.io
-        # plus ocp_install_agent_* vars
+        install_method: agent
+        install_skip: true
+        install_cluster_name: demo-ocp-agent
+        install_base_domain: dev.l-it.io
+        # plus install_agent_* vars
 
-    - role: lit.ocp.ocp_install
+    - role: lit.ocp.install
       vars:
-        ocp_install_method: upi
-        ocp_install_skip: true
-        ocp_install_cluster_name: demo-ocp-upi
-        ocp_install_base_domain: dev.l-it.io
+        install_method: upi
+        install_skip: true
+        install_cluster_name: demo-ocp-upi
+        install_base_domain: dev.l-it.io
         # plus ocp_install_upi_* vars (currently stub)
 
     - role: lit.ocp.gitops_bootstrap
