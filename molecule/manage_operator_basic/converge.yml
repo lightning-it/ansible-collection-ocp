@@ -1,0 +1,8 @@
+---
+- name: Converge manage_operator
+  hosts: manage_operator
+  gather_facts: false
+  vars:
+    manage_operator_skip: true
+  roles:
+    - role: lit.ocp.manage_operator

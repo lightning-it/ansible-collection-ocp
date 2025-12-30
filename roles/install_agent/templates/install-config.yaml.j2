@@ -1,0 +1,54 @@
+apiVersion: v1
+baseDomain: {{ install_agent_base_domain }}
+{% if install_agent_proxy | bool %}
+proxy:
+  httpProxy: "{{ install_agent_proxy_url }}"
+  httpsProxy: "{{ install_agent_proxy_url }}"
+  noProxy: "{{ install_agent_no_proxy }}"
+{% endif %}
+compute:
+  - architecture: amd64
+    hyperthreading: Enabled
+    name: worker
+    platform: {}
+    replicas: {{ groups['compute'] | length + groups['infra'] | length }}
+controlPlane:
+  architecture: amd64
+  hyperthreading: Enabled
+  name: master
+  platform: {}
+  replicas: 3
+metadata:
+  name: {{ install_agent_cluster_name }}
+networking:
+  clusterNetwork:
+    - cidr: {{ install_agent_pod_network }}
+      hostPrefix: 23
+  machineNetwork:
+    - cidr: {{ install_agent_machine_network }}
+  networkType: OVNKubernetes
+  serviceNetwork:
+    - {{ install_agent_service_network }}
+platform:
+  {{ lookup('template', 'platform-' ~ install_agent_platform ~ '.yml.j2') | indent(2) }}
+pullSecret: '{{ install_agent_pullsecret }}'
+sshKey: |
+{% for key in install_agent_ssh_pub_keys %}
+  {{ key }}
+{% endfor %}
+{% if install_agent_additional_trust_bundle | length > 0 %}
+additionalTrustBundle: |
+  {{ install_agent_additional_trust_bundle | indent(2) }}
+{% endif %}
+{% if install_agent_registry | bool %}
+ImageDigestSources:
+  - mirrors:
+    - {{ install_agent_registry_quayio }}/openshift-release-dev/ocp-v4.0-art-dev
+    source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+  - mirrors:
+    - {{ install_agent_registry_quayio }}/openshift-release-dev/ocp-release
+    source: quay.io/openshift-release-dev/ocp-release
+  - mirrors:
+    - eps-om-proj-prg-registry-redhat-io.artifactory.dhl.com
+    source: registry.redhat.io
+{% endif %}

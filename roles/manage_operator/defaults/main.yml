@@ -1,0 +1,18 @@
+---
+manage_operator_skip: false
+manage_operator_api_version: v1
+manage_operator_approve: true
+manage_operator_channel: stable
+manage_operator_create_namespace: false
+manage_operator_deployment_name: ''
+manage_operator_name: rhsso-operator
+manage_operator_namespace: rhsso
+manage_operator_group_name: "{{ manage_operator_name }}-group"
+manage_operator_plan: Manual
+manage_operator_source: redhat-operators
+manage_operator_source_namespace: openshift-marketplace
+manage_operator_starting_csv: ''
+manage_operator_project_metadata_extras: ''
+manage_operator_subscription_extras: ''
+manage_operator_state: present
+manage_operator_target_namespaces: false

@@ -1,0 +1,11 @@
+---
+# Entrypoint for OCP installation. Dispatches to method-specific roles.
+# Supported methods: upi | agent
+install_method: agent
+install_skip: false
+
+# Common install inputs (shared across methods).
+install_cluster_name: ""
+install_base_domain: ""
+install_pullsecret: ""
+install_ssh_pub_keys: []

@@ -1,0 +1,26 @@
+---
+driver:
+  name: docker
+
+platforms:
+  - name: gitops_bootstrap
+    image: quay.io/rockylinux/rockylinux:9
+    pre_build_image: true
+
+provisioner:
+  name: ansible
+  config_options:
+    defaults:
+      roles_path: ../../roles
+  inventory:
+    hosts:
+      all:
+        hosts:
+          gitops_bootstrap:
+            ansible_connection: docker
+  playbooks:
+    converge: converge.yml
+    verify: verify.yml
+
+verifier:
+  name: ansible

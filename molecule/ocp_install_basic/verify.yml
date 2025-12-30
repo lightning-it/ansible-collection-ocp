@@ -1,9 +1,0 @@
----
-- name: Verify ocp_install
-  hosts: ocp_install
-  gather_facts: false
-  tasks:
-    - name: Assert role executed
-      ansible.builtin.assert:
-        that:
-          - true

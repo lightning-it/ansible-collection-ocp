@@ -1,0 +1,12 @@
+---
+- name: Manage an OCP operator
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    manage_operator_name: example-operator
+    manage_operator_namespace: openshift-operators
+
+  roles:
+    - role: lit.ocp.manage_operator

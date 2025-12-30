@@ -1,0 +1,117 @@
+---
+# general config
+install_agent_skip: false
+install_agent_delegate_to: localhost
+install_agent_dir: /root
+install_agent_platform: vsphere
+install_agent_kubeconfig_dir: '~/.kube'
+
+# vsphere config
+install_agent_vsphere: true
+install_agent_vcenter_hostname:
+install_agent_vcenter_password:
+install_agent_vcenter_username:
+install_agent_vsphere_cluster:
+install_agent_vsphere_datacenter:
+install_agent_vsphere_network:
+
+# ocp config
+install_agent_base_domain: ''
+install_agent_cluster_name:
+install_agent_vault_path: >-
+  {{
+    cluster_id
+    | default('', true)
+    | ternary(
+      (cluster_id | default(''))[8:11]
+      ~ '/'
+      ~ (cluster_id | default(''))[11:14]
+      ~ '/'
+      ~ (cluster_id | default('')),
+      ''
+    )
+  }}
+install_agent_version: 4.18.13
+install_agent_os: linux
+install_agent_arch: x86_64
+install_agent_loadbalancer_usermanaged: false
+install_agent_mirror: >-
+  https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp
+install_agent_occlient: >-
+  {{
+    install_agent_mirror
+    ~ '/'
+    ~ install_agent_version
+    ~ '/openshift-client-linux-'
+    ~ install_agent_version
+    ~ '.tar.gz'
+  }}
+install_agent_download_url: quay.io/openshift-release-dev/ocp-release
+install_agent_machine_network:
+install_agent_service_network: 172.30.0.0/16
+install_agent_pod_network: 10.128.0.0/14
+install_agent_proxy: false
+install_agent_proxy_url:
+install_agent_no_proxy:
+install_agent_pullsecret: ''
+install_agent_pullsecret_lookup: ''
+install_agent_registry_quayio:
+install_agent_ssh_pub_keys: []
+install_agent_registry: false
+install_agent_root_ca:
+install_agent_ca_o:
+install_agent_additional_trust_bundle: ''
+install_agent_api_vip: >-
+  {{
+    lookup(
+      'community.general.dig',
+      'api.'
+      ~ install_agent_cluster_name
+      ~ '.'
+      ~ install_agent_base_domain
+    )
+    if (
+      install_agent_cluster_name | default('', true) | length > 0
+      and install_agent_base_domain | default('', true) | length > 0
+    )
+    else ''
+  }}
+install_agent_apps_vip: >-
+  {{
+    lookup(
+      'community.general.dig',
+      'wildcard.apps.'
+      ~ install_agent_cluster_name
+      ~ '.'
+      ~ install_agent_base_domain
+    )
+    if (
+      install_agent_cluster_name | default('', true) | length > 0
+      and install_agent_base_domain | default('', true) | length > 0
+    )
+    else ''
+  }}
+install_agent_ifname: ens192
+install_agent_gateway:
+install_agent_dns_servers:
+install_agent_netmask_prefix: >-
+  {{
+    (
+      install_agent_machine_network
+      | ansible.utils.ipaddr('prefix')
+    )
+    if install_agent_machine_network | default('', true) | length > 0
+    else ''
+  }}
+install_agent_image_tag_mirrors: {}
+install_agent_taints_ocs:
+  - effect: NoSchedule
+    key: node.ocs.openshift.io/storage
+    value: "true"
+install_agent_odf: true
+
+# hashicorp config
+install_agent_engine_mount_point: infra-secrets
+install_agent_hashi_vault_auth_method: approle
+install_agent_cluster_kubeconfig_vault_key: kubeconfig_CA
+install_agent_hashi_vault_validate_certs: true

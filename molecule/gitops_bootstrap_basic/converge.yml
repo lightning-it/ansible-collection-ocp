@@ -1,0 +1,8 @@
+---
+- name: Converge gitops_bootstrap
+  hosts: gitops_bootstrap
+  gather_facts: false
+  vars:
+    gitops_bootstrap_skip: true
+  roles:
+    - role: lit.ocp.gitops_bootstrap

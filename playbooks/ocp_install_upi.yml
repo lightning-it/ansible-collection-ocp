@@ -1,0 +1,13 @@
+---
+- name: Install OCP via UPI (placeholder)
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    install_method: upi
+    install_cluster_name: demo-ocp
+    install_base_domain: dev.l-it.io
+
+  roles:
+    - role: lit.ocp.install

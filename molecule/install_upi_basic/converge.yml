@@ -1,0 +1,8 @@
+---
+- name: Converge install_upi
+  hosts: install_upi
+  gather_facts: false
+  vars:
+    install_upi_skip: true
+  roles:
+    - role: lit.ocp.install_upi

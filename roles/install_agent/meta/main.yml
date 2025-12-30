@@ -1,0 +1,14 @@
+---
+galaxy_info:
+  role_name: install_agent
+  namespace: lit
+  author: Dirk Egert
+  company: Lightning IT
+  description: Agent-based OpenShift installation.
+  license: GPL-2.0-only
+  min_ansible_version: "2.15"
+  platforms:
+    - name: EL
+      versions:
+        - "9"
+dependencies: []

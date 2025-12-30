@@ -1,0 +1,39 @@
+---
+# Collection-level example playbook for lit.ocp
+#
+# This playbook is used as the "canonical" example entrypoint in CI
+# and for users who want to see how to apply the OCP roles.
+
+- name: OCP baseline example
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  roles:
+    - role: lit.ocp.install
+      vars:
+        install_method: agent
+        install_skip: true
+        install_cluster_name: demo-ocp-agent
+        install_base_domain: dev.l-it.io
+        # plus install_agent_* vars
+
+    - role: lit.ocp.install
+      vars:
+        install_method: upi
+        install_skip: true
+        install_cluster_name: demo-ocp-upi
+        install_base_domain: dev.l-it.io
+        # plus install_upi_* vars (currently stub)
+
+    - role: lit.ocp.gitops_bootstrap
+      vars:
+        gitops_bootstrap_skip: true
+        gitops_bootstrap_operator_state: present
+        gitops_bootstrap_operator_channel: gitops-1.18
+
+    - role: lit.ocp.manage_operator
+      vars:
+        manage_operator_skip: true
+        manage_operator_name: example-operator
+        manage_operator_namespace: openshift-operators

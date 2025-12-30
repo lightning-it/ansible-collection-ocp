@@ -1,8 +1,0 @@
----
-- name: Converge ocp_install
-  hosts: ocp_install
-  gather_facts: false
-  vars:
-    ocp_install_skip: true
-  roles:
-    - role: ocp_install

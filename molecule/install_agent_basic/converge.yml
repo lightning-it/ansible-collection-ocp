@@ -1,0 +1,8 @@
+---
+- name: Converge install_agent
+  hosts: install_agent
+  gather_facts: false
+  vars:
+    install_agent_skip: true
+  roles:
+    - role: lit.ocp.install_agent

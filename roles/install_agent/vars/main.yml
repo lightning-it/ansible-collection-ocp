@@ -1,0 +1,5 @@
+---
+install_agent_cluster_sub_dirs:
+  download: "{{ install_agent_dir }}/ocp/downloads"
+  config: "{{ install_agent_dir }}/ocp/config"
+  bin: "$HOME/.local/bin"
