@@ -32,8 +32,8 @@
         gitops_bootstrap_operator_state: present
         gitops_bootstrap_operator_channel: gitops-1.18
 
-    - role: lit.ocp.ocp_manage_operator
+    - role: lit.ocp.manage_operator
       vars:
-        ocp_manage_operator_skip: true
-        ocp_manage_operator_name: example-operator
-        ocp_manage_operator_namespace: openshift-operators
+        manage_operator_skip: true
+        manage_operator_name: example-operator
+        manage_operator_namespace: openshift-operators

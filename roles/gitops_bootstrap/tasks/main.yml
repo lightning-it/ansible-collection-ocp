@@ -104,22 +104,22 @@
 
 - name: Manage gitops operator
   vars:
-    ocp_manage_operator_name: "{{ gitops_bootstrap_operator_name }}"
-    ocp_manage_operator_namespace: openshift-gitops-operator
-    ocp_manage_operator_channel: "{{ gitops_bootstrap_operator_channel }}"
-    ocp_manage_operator_source: "{{ gitops_bootstrap_operator_source }}"
-    ocp_manage_operator_source_namespace: openshift-marketplace
-    ocp_manage_operator_deployment_name: >-
+    manage_operator_name: "{{ gitops_bootstrap_operator_name }}"
+    manage_operator_namespace: openshift-gitops-operator
+    manage_operator_channel: "{{ gitops_bootstrap_operator_channel }}"
+    manage_operator_source: "{{ gitops_bootstrap_operator_source }}"
+    manage_operator_source_namespace: openshift-marketplace
+    manage_operator_deployment_name: >-
       openshift-gitops-operator-controller-manager
-    ocp_manage_operator_create_namespace: true
-    ocp_manage_operator_starting_csv: >-
+    manage_operator_create_namespace: true
+    manage_operator_starting_csv: >-
       {{ gitops_bootstrap_operator_starting_csv }}
-    ocp_manage_operator_approve: >-
+    manage_operator_approve: >-
       {{ gitops_bootstrap_approve }}
-    ocp_manage_operator_subscription_extras: >-
+    manage_operator_subscription_extras: >-
       {{ gitops_bootstrap_operator_subscription_extras }}
   ansible.builtin.include_role:
-    name: ocp_manage_operator
+    name: lit.ocp.manage_operator
 
 - name: >-
     Add cluster-admin role to serviceaccount

@@ -3,7 +3,7 @@ driver:
   name: docker
 
 platforms:
-  - name: ocp_manage_operator
+  - name: manage_operator
     image: quay.io/rockylinux/rockylinux:9
     pre_build_image: true
 
@@ -16,7 +16,7 @@ provisioner:
     hosts:
       all:
         hosts:
-          ocp_manage_operator:
+          manage_operator:
             ansible_connection: docker
   playbooks:
     converge: converge.yml

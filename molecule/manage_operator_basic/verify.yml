@@ -1,6 +1,6 @@
 ---
-- name: Verify ocp_manage_operator
-  hosts: ocp_manage_operator
+- name: Verify manage_operator
+  hosts: manage_operator
   gather_facts: false
   tasks:
     - name: Assert stub ran

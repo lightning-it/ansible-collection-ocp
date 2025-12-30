@@ -5,8 +5,8 @@
   gather_facts: false
 
   vars:
-    ocp_manage_operator_name: example-operator
-    ocp_manage_operator_namespace: openshift-operators
+    manage_operator_name: example-operator
+    manage_operator_namespace: openshift-operators
 
   roles:
-    - role: lit.ocp.ocp_manage_operator
+    - role: lit.ocp.manage_operator
