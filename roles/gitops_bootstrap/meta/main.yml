@@ -1,9 +1,9 @@
 ---
 galaxy_info:
-  role_name: gitops
+  role_name: gitops_bootstrap
   namespace: default
   author: Dirk Egert
-  description: Role to manage gitops Installation
+  description: Role to bootstrap and manage OpenShift GitOps installation
   company: degert-it.de
   license: license (BSD, MIT)
   min_ansible_version: '2.8'

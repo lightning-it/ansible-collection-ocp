@@ -3,7 +3,7 @@ driver:
   name: docker
 
 platforms:
-  - name: gitops
+  - name: gitops_bootstrap
     image: quay.io/rockylinux/rockylinux:9
     pre_build_image: true
 
@@ -16,7 +16,7 @@ provisioner:
     hosts:
       all:
         hosts:
-          gitops:
+          gitops_bootstrap:
             ansible_connection: docker
   playbooks:
     converge: converge.yml

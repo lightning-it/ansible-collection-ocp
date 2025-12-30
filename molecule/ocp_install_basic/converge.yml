@@ -1,11 +1,8 @@
-# ansible-lint: ignore=fqcn[keyword]
 ---
 - name: Converge ocp_install
   hosts: ocp_install
   gather_facts: false
-  collections:
-    - lit.ocp
   vars:
     ocp_install_skip: true
   roles:
-    - role: ocp_install
+    - role: lit.ocp.ocp_install

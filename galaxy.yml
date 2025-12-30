@@ -23,6 +23,8 @@ tags:
   - infrastructure
 dependencies:
   ansible.posix: '*'
+  ansible.utils: '*'
+  community.general: '*'
   kubernetes.core: '*'
   community.hashi_vault: '*'
   community.crypto: '*'

@@ -1,6 +1,6 @@
 ---
-- name: Verify gitops
-  hosts: gitops
+- name: Verify gitops_bootstrap
+  hosts: gitops_bootstrap
   gather_facts: false
   tasks:
     - name: Assert stub ran

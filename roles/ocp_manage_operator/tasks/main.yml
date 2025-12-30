@@ -126,8 +126,10 @@
   register: subscription_info
   until: >
     subscription_info.resources
-    | json_query('[*].status.installplan.kind')
-    | unique == ["InstallPlan"]
+    | map(attribute='status.installplan.kind')
+    | select('defined')
+    | list
+    | unique == ['InstallPlan']
   delay: 10
   retries: 60
   when:
@@ -139,12 +141,13 @@
     ocp_manage_operator_pending_approval: >-
       {{
         subscription_info.resources
-        | json_query(
-          '[*].status.conditions[?reason==`RequiresApproval`][].status'
-        )
-        | select('match', 'True')
-        | join()
-        | bool
+        | selectattr('status.conditions', 'defined')
+        | map(attribute='status.conditions')
+        | sum(start=[])
+        | selectattr('reason', 'equalto', 'RequiresApproval')
+        | selectattr('status', 'equalto', 'True')
+        | list
+        | length > 0
       }}
   when:
     - ocp_manage_operator_approve | bool
@@ -240,10 +243,11 @@
   register: output_info
   until: >
     output_info.resources
-    | json_query(
-      '[*].status.conditions[?reason==`MinimumReplicasAvailable`][].status'
-    )
-    | select('match', 'True')
+    | selectattr('status.conditions', 'defined')
+    | map(attribute='status.conditions')
+    | sum(start=[])
+    | selectattr('reason', 'equalto', 'MinimumReplicasAvailable')
+    | selectattr('status', 'equalto', 'True')
     | list
     | length == 1
   delay: 10

@@ -19,7 +19,18 @@ ocp_install_agent_vsphere_network:
 ocp_install_agent_base_domain: ''
 ocp_install_agent_cluster_name:
 ocp_install_agent_vault_path: >-
-  {{ cluster_id[8:11] }}/{{ cluster_id[11:14] }}/{{ cluster_id }}
+  {{
+    cluster_id
+    | default('', true)
+    | ternary(
+      (cluster_id | default(''))[8:11]
+      ~ '/'
+      ~ (cluster_id | default(''))[11:14]
+      ~ '/'
+      ~ (cluster_id | default('')),
+      ''
+    )
+  }}
 ocp_install_agent_version: 4.18.13
 ocp_install_agent_os: linux
 ocp_install_agent_arch: x86_64
@@ -58,6 +69,11 @@ ocp_install_agent_api_vip: >-
       ~ '.'
       ~ ocp_install_agent_base_domain
     )
+    if (
+      ocp_install_agent_cluster_name | default('', true) | length > 0
+      and ocp_install_agent_base_domain | default('', true) | length > 0
+    )
+    else ''
   }}
 ocp_install_agent_apps_vip: >-
   {{
@@ -68,14 +84,23 @@ ocp_install_agent_apps_vip: >-
       ~ '.'
       ~ ocp_install_agent_base_domain
     )
+    if (
+      ocp_install_agent_cluster_name | default('', true) | length > 0
+      and ocp_install_agent_base_domain | default('', true) | length > 0
+    )
+    else ''
   }}
 ocp_install_agent_ifname: ens192
 ocp_install_agent_gateway:
 ocp_install_agent_dns_servers:
 ocp_install_agent_netmask_prefix: >-
   {{
-    ocp_install_agent_machine_network
-    | ansible.utils.ipaddr('prefix')
+    (
+      ocp_install_agent_machine_network
+      | ansible.utils.ipaddr('prefix')
+    )
+    if ocp_install_agent_machine_network | default('', true) | length > 0
+    else ''
   }}
 ocp_install_agent_image_tag_mirrors: {}
 ocp_install_agent_taints_ocs:
