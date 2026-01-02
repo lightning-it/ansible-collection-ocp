@@ -1,3 +1,9 @@
+## [1.2.0](https://github.com/lightning-it/ansible-collection-ocp/compare/v1.1.0...v1.2.0) (2026-01-02)
+
+### Features
+
+* update galaxy.yml tags and simplify renovate.json configuration ([15da4f9](https://github.com/lightning-it/ansible-collection-ocp/commit/15da4f9fa6b5e1dc32f0c227f8e762f175afe2af))
+
 ## [1.1.0](https://github.com/lightning-it/ansible-collection-ocp/compare/v1.0.0...v1.1.0) (2025-12-30)
 
 ### Features

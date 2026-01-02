@@ -1,6 +1,6 @@
 namespace: lit
 name: ocp
-version: 1.1.0
+version: 1.2.0
 readme: README.md
 description: Opinionated Ansible collection for Red Hat OpenShift Container Platform
   in the ModuLix ecosystem. Provides roles for cluster bring-up, day-2 operations
