@@ -1,3 +1,9 @@
+## [1.3.0](https://github.com/lightning-it/ansible-collection-ocp/compare/v1.2.0...v1.3.0) (2026-01-02)
+
+### Features
+
+* update renovate.json to extend from shared assets configuration ([ef84588](https://github.com/lightning-it/ansible-collection-ocp/commit/ef84588bef8378d0b96c75f52dfab0afc2127ea9))
+
 ## [1.2.0](https://github.com/lightning-it/ansible-collection-ocp/compare/v1.1.0...v1.2.0) (2026-01-02)
 
 ### Features
