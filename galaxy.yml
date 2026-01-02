@@ -11,11 +11,10 @@ authors:
 license:
 - GPL-2.0-only
 tags:
+- modulix
 - ocp
 - openshift
 - kubernetes
-- platform
-- day2
 - automation
 - devops
 - infrastructure
