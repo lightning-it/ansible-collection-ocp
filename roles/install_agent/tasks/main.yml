@@ -2,38 +2,35 @@
 - name: Skip agent install (test/stub mode)
   ansible.builtin.meta: end_play
   when: install_agent_skip | bool
-- name: Ensure all needed vars are present
-  ansible.builtin.include_tasks: assert.yml
-  tags:
-    - always
 
 - name: Fetch values from Vault or fallback
+  run_once: true
   ansible.builtin.set_fact:
     install_agent_additional_trust_bundle: >-
       {{
-        lookup(
-          'community.hashi_vault.hashi_vault',
-          g_root_ca_lookup,
-          default=install_agent_additional_trust_bundle
-        )
+        lookup('community.hashi_vault.hashi_vault', g_root_ca_lookup)
+        if g_root_ca_lookup | length > 0
+        else install_agent_additional_trust_bundle
       }}
     install_agent_root_ca: >-
       {{
-        lookup(
-          'community.hashi_vault.hashi_vault',
-          g_root_ca_lookup,
-          default=install_agent_root_ca
-        )
+        lookup('community.hashi_vault.hashi_vault', g_root_ca_lookup)
+        if g_root_ca_lookup | length > 0
+        else install_agent_root_ca
       }}
     install_agent_pullsecret: >-
       {{
-        lookup(
-          'community.hashi_vault.hashi_vault',
-          install_agent_pullsecret_lookup,
-          default=install_agent_pullsecret
-        )
+        lookup('community.hashi_vault.hashi_vault', install_agent_pullsecret_lookup)
+        if install_agent_pullsecret_lookup | length > 0
+        else install_agent_pullsecret
       }}
   no_log: true
+  tags:
+    - always
+
+- name: Ensure all needed vars are present
+  run_once: true
+  ansible.builtin.include_tasks: assert.yml
   tags:
     - always
 

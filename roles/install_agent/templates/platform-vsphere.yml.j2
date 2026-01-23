@@ -12,8 +12,8 @@ vsphere:
       topology:
         computeCluster: /{{ install_agent_vsphere_datacenter }}/host/{{ install_agent_vsphere_cluster }}
         datacenter: {{ install_agent_vsphere_datacenter }}
-        datastore: /{{ install_agent_vsphere_datacenter }}/datastore/{{ vvs_vmware_iso_datastore }}
-        folder: {{ vvs_folder_full_path }}
+        datastore: /{{ install_agent_vsphere_datacenter }}/datastore/{{ vmware_vsphere_vmware_iso_datastore }}
+        folder: {{ vmware_vsphere_folder_full_path }}
         networks:
           - {{ install_agent_vsphere_network }}
 {% if install_agent_vsphere_resource_pool is defined %}
