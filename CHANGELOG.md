@@ -1,3 +1,9 @@
+## [1.3.1](https://github.com/lightning-it/ansible-collection-ocp/compare/v1.3.0...v1.3.1) (2026-02-03)
+
+### Bug Fixes
+
+* update references to use container-ee-wunder-devtools-ubi9 ([#42](https://github.com/lightning-it/ansible-collection-ocp/issues/42)) ([4f9c323](https://github.com/lightning-it/ansible-collection-ocp/commit/4f9c323e3bdeb50151f1c6ab7f5ddd13b95e5581))
+
 ## [1.3.0](https://github.com/lightning-it/ansible-collection-ocp/compare/v1.2.0...v1.3.0) (2026-01-02)
 
 ### Features
