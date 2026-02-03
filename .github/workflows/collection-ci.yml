@@ -37,7 +37,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      # 2) Run ansible-lint inside the container-ee-wunder-devtools-ubi9 container
+      # 2) Run ansible-lint inside the ee-wunder-devtools-ubi9 container
       - name: Run ansible-lint via devtools-ansible-lint.sh
         env:
           # These env vars make the script generic across collections
