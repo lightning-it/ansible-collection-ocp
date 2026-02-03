@@ -1,3 +1,4 @@
+---
 namespace: lit
 name: ocp
 version: 1.3.0
@@ -7,17 +8,17 @@ description: Opinionated Ansible collection for Red Hat OpenShift Container Plat
   and platform services on top of OpenShift.
 repository: https://github.com/lightning-it/ansible-collection-ocp
 authors:
-- Lightning IT
+  - Lightning IT
 license:
-- GPL-2.0-only
+  - GPL-3.0-only
 tags:
-- modulix
-- ocp
-- openshift
-- kubernetes
-- automation
-- devops
-- infrastructure
+  - modulix
+  - ocp
+  - openshift
+  - kubernetes
+  - automation
+  - devops
+  - infrastructure
 dependencies:
   ansible.posix: '*'
   ansible.utils: '*'
@@ -27,13 +28,13 @@ dependencies:
   community.crypto: '*'
   community.vmware: '*'
 build_ignore:
-- node_modules
-- vagrant
-- .git
-- .github
-- .gitignore
-- .molecule
-- ansible_collections
-- infra
-- '*.terraform*'
-- '*.tar.gz'
+  - node_modules
+  - vagrant
+  - .git
+  - .github
+  - .gitignore
+  - .molecule
+  - ansible_collections
+  - infra
+  - '*.terraform*'
+  - '*.tar.gz'
