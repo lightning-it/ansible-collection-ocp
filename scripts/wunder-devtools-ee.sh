@@ -3,7 +3,7 @@ set -euo pipefail
 
 IMAGE="quay.io/l-it/ee-wunder-devtools-ubi9:v1.2.7"
 CONTAINER_HOME="${CONTAINER_HOME:-/tmp/wunder}"
-HOST_HOME_CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/container-ee-wunder-devtools-ubi9/home"
+HOST_HOME_CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/wunder-devtools-ee/home"
 
 mkdir -p "$HOST_HOME_CACHE"
 
