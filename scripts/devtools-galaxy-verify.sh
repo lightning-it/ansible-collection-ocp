@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Lightweight Galaxy-style checks: ensure the collection builds and every role
-# has meta/main.yml and a README.* present. Runs inside container-ee-wunder-devtools-ubi9.
+# has meta/main.yml and a README.* present. Runs inside ee-wunder-devtools-ubi9.
 set -eo pipefail
 
 COLLECTION_NAMESPACE="${COLLECTION_NAMESPACE:-lit}"
