@@ -31,7 +31,7 @@ networking:
     - {{ install_agent_service_network }}
 platform:
   {{ lookup('template', 'platform-' ~ install_agent_platform ~ '.yml.j2') | indent(2) }}
-pullSecret: '{{ install_agent_pullsecret }}'
+pullSecret: '{{ install_agent_pullsecret | to_json }}'
 sshKey: |
 {% for key in install_agent_ssh_pub_keys %}
   {{ key }}

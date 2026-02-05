@@ -53,8 +53,7 @@
     remote_src: true
   vars:
     _install_agent_occlient_file: >-
-      {{ install_agent_cluster_sub_dirs.download }}/
-      {{ install_agent_occlient | basename }}
+      {{ install_agent_cluster_sub_dirs.download }}/{{ install_agent_occlient | basename }}
   loop:
     - "{{ _install_agent_occlient_file }}"
   changed_when: false
@@ -71,8 +70,7 @@
       {{ install_agent_cluster_sub_dirs.bin }}/oc adm release extract
       --command="openshift-install"
       --command-os="{{ install_agent_os }}"
-      "{{ install_agent_download_url }}:
-      {{ install_agent_version }}-{{ install_agent_arch }}"
+      "{{ install_agent_download_url }}:{{ install_agent_version }}-{{ install_agent_arch }}"
       --to="{{ install_agent_cluster_sub_dirs.download }}/"
       --registry-config="$HOME/.docker/config.json"
   register: openshift_install

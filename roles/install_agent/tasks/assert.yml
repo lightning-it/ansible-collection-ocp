@@ -9,7 +9,7 @@
       - install_agent_vcenter_username | length > 0
       - install_agent_vsphere_cluster | length > 0
       - install_agent_vsphere_datacenter | length > 0
-      - vvs_vmware_iso_datastore | length > 0
+      - vmware_vsphere_vmware_iso_datastore | length > 0
       - install_agent_vsphere_network | length > 0
   when: install_agent_platform == 'vsphere'
 
@@ -21,4 +21,3 @@
       - install_agent_gateway | length > 0
       - install_agent_gateway | length > 0
       - install_agent_dns_servers | length > 0
-      - install_agent_ca_o | length > 0
