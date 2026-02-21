@@ -1,3 +1,9 @@
+## [1.3.3](https://github.com/lightning-it/ansible-collection-ocp/compare/v1.3.2...v1.3.3) (2026-02-21)
+
+### Bug Fixes
+
+* update regex manager descriptions and patterns for galaxy.yml ([#46](https://github.com/lightning-it/ansible-collection-ocp/issues/46)) ([7f10d7e](https://github.com/lightning-it/ansible-collection-ocp/commit/7f10d7ef93e3b232194c352e19fa1ada7ffda7e1))
+
 ## [1.3.2](https://github.com/lightning-it/ansible-collection-ocp/compare/v1.3.1...v1.3.2) (2026-02-05)
 
 ### Bug Fixes
