@@ -1,3 +1,9 @@
+## [1.3.4](https://github.com/lightning-it/ansible-collection-ocp/compare/v1.3.3...v1.3.4) (2026-02-23)
+
+### Bug Fixes
+
+* update galaxy.yml dependencies and add renovate rules for versio… ([#50](https://github.com/lightning-it/ansible-collection-ocp/issues/50)) ([15ca70a](https://github.com/lightning-it/ansible-collection-ocp/commit/15ca70adb8d14f4952d094045ea5d14933fbdd78))
+
 ## [1.3.3](https://github.com/lightning-it/ansible-collection-ocp/compare/v1.3.2...v1.3.3) (2026-02-21)
 
 ### Bug Fixes
