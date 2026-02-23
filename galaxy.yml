@@ -22,11 +22,12 @@ tags:
 dependencies:
   ansible.posix: '*'
   ansible.utils: '*'
-  community.general: '*'
+  community.general: '>=7.0.0,<12.0.0'
+  community.docker: '*'
   kubernetes.core: '*'
   community.hashi_vault: '*'
   community.crypto: '*'
-  community.vmware: '*'
+  community.vmware: '5.10.0'
 build_ignore:
   - node_modules
   - vagrant
