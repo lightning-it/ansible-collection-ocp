@@ -3,6 +3,7 @@ collections:
   - name: ansible.posix
   - name: ansible.utils
   - name: community.general
+  - name: community.docker
   - name: kubernetes.core
   - name: community.hashi_vault
   - name: community.crypto
