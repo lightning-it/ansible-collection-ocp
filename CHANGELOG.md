@@ -1,3 +1,9 @@
+## [1.3.5](https://github.com/lightning-it/ansible-collection-ocp/compare/v1.3.4...v1.3.5) (2026-02-23)
+
+### Bug Fixes
+
+* update environment variable handling for ansible-compat compatibility ([#52](https://github.com/lightning-it/ansible-collection-ocp/issues/52)) ([7b85ddb](https://github.com/lightning-it/ansible-collection-ocp/commit/7b85ddba31aeaf98dd4fd0a2365dca409e9248d3))
+
 ## [1.3.4](https://github.com/lightning-it/ansible-collection-ocp/compare/v1.3.3...v1.3.4) (2026-02-23)
 
 ### Bug Fixes
