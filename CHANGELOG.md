@@ -1,3 +1,9 @@
+## [1.3.7](https://github.com/lightning-it/ansible-collection-ocp/compare/v1.3.6...v1.3.7) (2026-02-24)
+
+### Bug Fixes
+
+* update community.general version constraints for compatibility ([#56](https://github.com/lightning-it/ansible-collection-ocp/issues/56)) ([bb6a745](https://github.com/lightning-it/ansible-collection-ocp/commit/bb6a7458e7aba78dbdc4b7aa23405a2828668ad9))
+
 ## [1.3.6](https://github.com/lightning-it/ansible-collection-ocp/compare/v1.3.5...v1.3.6) (2026-02-23)
 
 ### Bug Fixes
