@@ -3,6 +3,7 @@ collections:
   - name: ansible.posix
   - name: ansible.utils
   - name: community.general
+    version: "11.4.5"
   - name: community.docker
   - name: kubernetes.core
   - name: community.hashi_vault
