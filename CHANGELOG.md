@@ -1,3 +1,9 @@
+## [1.3.8](https://github.com/lightning-it/ansible-collection-ocp/compare/v1.3.7...v1.3.8) (2026-02-25)
+
+### Bug Fixes
+
+* sync shared assets from lightning-it/shared-assets ([#58](https://github.com/lightning-it/ansible-collection-ocp/issues/58)) ([3db85e5](https://github.com/lightning-it/ansible-collection-ocp/commit/3db85e5f01b3e08c27df1809e8b46868473dc25a))
+
 ## [1.3.7](https://github.com/lightning-it/ansible-collection-ocp/compare/v1.3.6...v1.3.7) (2026-02-24)
 
 ### Bug Fixes
