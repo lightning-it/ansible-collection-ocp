@@ -23,6 +23,8 @@
       manage_operator_target_namespaces: {{ manage_operator_target_namespaces }}
 
 - name: Create project {{ manage_operator_namespace }}
+  delegate_to: localhost
+  run_once: true
   kubernetes.core.k8s:
     state: present
     definition: |
@@ -38,6 +40,8 @@
     - manage_operator_create_namespace | bool
 
 - name: Check if OperatorGroup exists in {{ manage_operator_namespace }}
+  delegate_to: localhost
+  run_once: true
   kubernetes.core.k8s_info:
     api_version: operators.coreos.com/v1
     kind: OperatorGroup
@@ -50,6 +54,8 @@
     operatorgroup_exists: "{{ operatorgroup_info.resources | length > 0 }}"
 
 - name: Create OperatorGroup if it does not exist
+  delegate_to: localhost
+  run_once: true
   kubernetes.core.k8s:
     state: present
     definition: |
@@ -68,6 +74,8 @@
     - manage_operator_state != 'absent'
 
 - name: Set operator subscription to state {{ manage_operator_state }}
+  delegate_to: localhost
+  run_once: true
   kubernetes.core.k8s:
     state: "{{ manage_operator_state }}"
     definition: |
@@ -92,6 +100,8 @@
   when: manage_operator_state != 'absent'
 
 - name: Wait for subscription
+  delegate_to: localhost
+  run_once: true
   kubernetes.core.k8s_info:
     api_version: operators.coreos.com/v1alpha1
     kind: Subscription
@@ -114,6 +124,8 @@
     - subscription_out.changed
 
 - name: Check for pending approval
+  delegate_to: localhost
+  run_once: true
   kubernetes.core.k8s_info:
     api_version: operators.coreos.com/v1alpha1
     kind: Subscription
@@ -153,6 +165,8 @@
 
     - name: >-
         Get current operator currentCSV in {{ manage_operator_namespace }}
+      delegate_to: localhost
+      run_once: true
       kubernetes.core.k8s_info:
         api_version: operators.coreos.com/v1alpha1
         kind: Subscription
@@ -176,6 +190,8 @@
     - name: >-
         Wait for install plan with correct CSV in
         {{ manage_operator_namespace }}
+      delegate_to: localhost
+      run_once: true
       kubernetes.core.k8s_info:
         api_version: operators.coreos.com/v1alpha1
         kind: InstallPlan
@@ -211,6 +227,8 @@
       when: manage_operator_pending_approval
 
     - name: Approve installation
+      delegate_to: localhost
+      run_once: true
       kubernetes.core.k8s:
         merge_type: merge
         definition:
@@ -229,6 +247,8 @@
   when:
     - "manage_operator_state != 'absent'"
     - "manage_operator_deployment_name | length > 0"
+  delegate_to: localhost
+  run_once: true
   kubernetes.core.k8s_info:
     api_version: "{{ manage_operator_api_version }}"
     kind: Deployment
@@ -254,6 +274,8 @@
     - manage_operator_state != 'absent'
     - manage_operator_deployment_name | length == 0
     - manage_operator_deployment_label | length > 0
+  delegate_to: localhost
+  run_once: true
   kubernetes.core.k8s_info:
     api_version: apps/v1
     kind: Deployment
@@ -282,6 +304,8 @@
 
 - name: Get current operator installedCSV in {{ manage_operator_namespace }}
   when: manage_operator_state == 'absent'
+  delegate_to: localhost
+  run_once: true
   kubernetes.core.k8s_info:
     api_version: operators.coreos.com/v1alpha1
     kind: Subscription
@@ -303,6 +327,8 @@
     Delete ClusterServiceVersion
     {{ manage_operator_installed_csv | default('') }}
   when: manage_operator_state == 'absent'
+  delegate_to: localhost
+  run_once: true
   kubernetes.core.k8s:
     state: absent
     api_version: operators.coreos.com/v1alpha1
@@ -313,6 +339,8 @@
 
 - name: Delete Subscription {{ manage_operator_name }}
   when: manage_operator_state == 'absent'
+  delegate_to: localhost
+  run_once: true
   kubernetes.core.k8s:
     state: absent
     api_version: operators.coreos.com/v1alpha1

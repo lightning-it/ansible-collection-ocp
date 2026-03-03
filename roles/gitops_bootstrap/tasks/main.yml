@@ -1,5 +1,6 @@
 ---
 - name: Normalize gitops_bootstrap variables (backward compatibility)
+  run_once: true
   ansible.builtin.set_fact:
     gitops_bootstrap_skip: >-
       {{ gitops_bootstrap_skip | default(vars.get('gitops_skip'), true) }}
@@ -103,6 +104,7 @@
   when: gitops_bootstrap_skip | bool
 
 - name: Manage gitops operator
+  run_once: true
   vars:
     manage_operator_name: "{{ gitops_bootstrap_operator_name }}"
     manage_operator_namespace: openshift-gitops-operator
@@ -124,6 +126,8 @@
 - name: >-
     Add cluster-admin role to serviceaccount
     openshift-gitops-argocd-application-controller
+  delegate_to: localhost
+  run_once: true
   kubernetes.core.k8s:
     state: present
     definition:
@@ -142,6 +146,8 @@
           namespace: openshift-gitops
 
 - name: Fetch repo passwords from Vault
+  delegate_to: localhost
+  run_once: true
   ansible.builtin.set_fact:
     gitops_bootstrap_repo_templates: >-
       {{
@@ -161,6 +167,8 @@
   no_log: true
 
 - name: Create repo secret templates for first deployment
+  delegate_to: localhost
+  run_once: true
   kubernetes.core.k8s:
     definition: >-
       {{
@@ -172,7 +180,19 @@
   with_dict: "{{ gitops_bootstrap_repo_templates }}"
   no_log: true
 
+- name: Calculate gitops bootstrap value files
+  run_once: true
+  ansible.builtin.set_fact:
+    computed_value_files:
+      - "cluster/{{ cluster_id[8:11] }}/values.yaml"
+      - "cluster/{{ cluster_id[8:11] }}/{{ cluster_id[11:14] }}/values.yaml"
+      - "cluster/{{ cluster_id[8:11] }}/{{ cluster_id[11:14] }}/{{ cluster_id }}/values.yaml"
+
 - name: Create argocd app of apps
+  delegate_to: localhost
+  run_once: true
+  vars:
+    gitops_bootstrap_value_files: "{{ computed_value_files }}"
   kubernetes.core.k8s:
     definition: >-
       {{
@@ -185,6 +205,8 @@
   when: gitops_bootstrap_operator_state != 'absent'
 
 - name: Set argocd to defined state
+  delegate_to: localhost
+  run_once: true
   kubernetes.core.k8s:
     definition: >-
       {{
@@ -199,6 +221,7 @@
   when: gitops_bootstrap_operator_state != 'absent'
 
 - name: Init vault lookup strings
+  run_once: true
   ansible.builtin.set_fact:
     gitops_bootstrap_ext_role_id_lookup: |
       secret={{ gitops_bootstrap_external_secrets_path }}:role_id
@@ -214,9 +237,10 @@
       validate_certs={{ gitops_bootstrap_hashi_vault_validate_certs | string }}
       role_id={{ g_vault_approle | default('') }}
       secret_id={{ g_vault_secretid | default('') }}
-  when: gitops_bootstrap_vault_enabled
+  when: gitops_bootstrap_vault_enabled | bool
 
 - name: Get approle secrets from vault
+  run_once: true
   ansible.builtin.set_fact:
     gitops_bootstrap_ext_secrets_role_id: >-
       {{
@@ -234,9 +258,11 @@
       }}
   ignore_errors: true
   register: get_secrets
-  when: gitops_bootstrap_vault_enabled
+  when: gitops_bootstrap_vault_enabled | bool
 
 - name: Create approle secret for external secrets
+  delegate_to: localhost
+  run_once: true
   kubernetes.core.k8s:
     definition: >-
       {{
