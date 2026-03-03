@@ -26,7 +26,7 @@ hosts:
         ipv4:
           enabled: true
           address:
-            - ip: {{ lookup('dig', node.item) }}
+            - ip: {{ lookup('pipe', 'getent hosts ' + node.item).split() | first }}
               prefix-length: {{ install_agent_netmask_prefix }}
           dhcp: false
         ipv6:
