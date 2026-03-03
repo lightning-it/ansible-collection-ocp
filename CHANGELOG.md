@@ -1,3 +1,9 @@
+## [1.3.10](https://github.com/lightning-it/ansible-collection-ocp/compare/v1.3.9...v1.3.10) (2026-03-03)
+
+### Bug Fixes
+
+* fix some issues ([3065727](https://github.com/lightning-it/ansible-collection-ocp/commit/306572711ee78f7aae6268f8dc650e8c9aebb28f))
+
 ## [1.3.9](https://github.com/lightning-it/ansible-collection-ocp/compare/v1.3.8...v1.3.9) (2026-03-03)
 
 ### Bug Fixes
