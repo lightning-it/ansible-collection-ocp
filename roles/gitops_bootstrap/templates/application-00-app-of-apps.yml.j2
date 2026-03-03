@@ -15,7 +15,7 @@ spec:
     helm:
       valueFiles:
 {% for vf in gitops_bootstrap_value_files %}
-    - {{ vf }}
+        - {{ vf }}
 {% endfor %}
   syncPolicy:
     automated:
