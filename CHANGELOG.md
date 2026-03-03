@@ -1,3 +1,10 @@
+## [1.3.9](https://github.com/lightning-it/ansible-collection-ocp/compare/v1.3.8...v1.3.9) (2026-03-03)
+
+### Bug Fixes
+
+* also works via tcp ([6a26b23](https://github.com/lightning-it/ansible-collection-ocp/commit/6a26b23eb0a1739fee189260d4ca52fa937ff00a))
+* switch to different path ([cba3538](https://github.com/lightning-it/ansible-collection-ocp/commit/cba353866469975d6a08429f0e95ee2d912ac6ab))
+
 ## [1.3.8](https://github.com/lightning-it/ansible-collection-ocp/compare/v1.3.7...v1.3.8) (2026-02-25)
 
 ### Bug Fixes
