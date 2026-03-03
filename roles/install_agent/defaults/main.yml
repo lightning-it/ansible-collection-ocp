@@ -2,7 +2,7 @@
 # general config
 install_agent_skip: false
 install_agent_delegate_to: localhost
-install_agent_dir: /root
+install_agent_dir: /runner
 install_agent_platform: vsphere
 install_agent_kubeconfig_dir: '~/.kube'
 
