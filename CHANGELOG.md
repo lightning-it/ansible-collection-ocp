@@ -1,3 +1,9 @@
+## [1.3.11](https://github.com/lightning-it/ansible-collection-ocp/compare/v1.3.10...v1.3.11) (2026-03-10)
+
+### Bug Fixes
+
+* add baremetal config ([9d75a59](https://github.com/lightning-it/ansible-collection-ocp/commit/9d75a59a11638e15ddcfd61e4d27b74c0890f022))
+
 ## [1.3.10](https://github.com/lightning-it/ansible-collection-ocp/compare/v1.3.9...v1.3.10) (2026-03-03)
 
 ### Bug Fixes
