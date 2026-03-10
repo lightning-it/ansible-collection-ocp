@@ -1,0 +1,9 @@
+baremetal:
+{% if install_agent_loadbalancer_usermanaged | bool %}
+  loadBalancer:
+    type: UserManaged
+{% endif %}
+  apiVIPs:
+    - {{ install_agent_api_vip }}
+  ingressVIPs:
+    - {{ install_agent_apps_vip }}

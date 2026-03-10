@@ -14,6 +14,14 @@ install_agent_vcenter_username:
 install_agent_vsphere_cluster:
 install_agent_vsphere_datacenter:
 install_agent_vsphere_network:
+install_agent_vsphere_group:
+  - "{{ groups['control'] }}"
+  - "{{ groups['infra'] }}"
+  - "{{ groups['compute'] }}"
+
+# baremetal config
+install_agent_baremetal: false
+install_agent_idrac: false
 
 # ocp config
 install_agent_base_domain: ''

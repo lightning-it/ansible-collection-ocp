@@ -12,16 +12,27 @@
         datacenter: "{{ vmware_vsphere_datacenter }}"
         folder: "{{ vmware_vsphere_folder_name }}"
         name: "{{ hostvars[item]['inventory_hostname'] }}"
-      with_items:
-        - "{{ groups['control'] }}"
-        - "{{ groups['infra'] }}"
-        - "{{ groups['compute'] }}"
+      with_items: "{{ install_agent_vsphere_group | flatten }}"
       register: vminfo
 
     - name: Set fact
       run_once: true
       ansible.builtin.set_fact:
         install_agent_create_vms_agent_based_vminfo: "{{ vminfo.results }}"
+      when: vminfo is defined
+
+- name: Collect vminfo entries from all hosts
+  delegate_to: localhost
+  run_once: true
+  ansible.builtin.set_fact:
+    install_agent_create_vms_agent_based_vminfo: >-
+      {{
+        (install_agent_create_vms_agent_based_vminfo | default([]))
+        + groups['ocp']
+        | map('extract', hostvars, 'current_vminfo_entry')
+        | select('defined')
+        | list
+      }}
 
 - name: Create agent-config
   block:
@@ -99,3 +110,15 @@
         datastore: "{{ vmware_vsphere_vmware_iso_datastore }}"
         path: "{{ vmware_vsphere_iso_path }}"
         src: "{{ install_agent_cluster_sub_dirs.config }}/agent.x86_64.iso"
+      when:
+        - not install_agent_baremetal | bool
+
+    - name: Copy agent.x86_64.iso to Project dir
+      delegate_to: "{{ install_agent_delegate_to }}"
+      run_once: true
+      ansible.builtin.copy:
+        src: "{{ install_agent_cluster_sub_dirs.config }}/agent.x86_64.iso"
+        dest: "{{ install_agent_dir }}/project/agent-{{ cluster_id }}.x86_64.iso"
+        mode: '0644'
+      when:
+        - install_agent_baremetal | bool
