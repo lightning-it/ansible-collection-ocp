@@ -48,6 +48,10 @@
   register: current
   no_log: true
 
+- name: Get information for Bare Metal Server
+  ansible.builtin.include_tasks: get_baremetal_infos.yml
+  when: install_agent_baremetal | bool
+
 - name: Install OCP
   delegate_to: "{{ install_agent_delegate_to }}"
   run_once: true
@@ -71,6 +75,15 @@
 
     - name: Poweron VMs
       ansible.builtin.include_tasks: power_on_vms.yml
+      when:
+        - not install_agent_baremetal or install_agent_idrac
+
+    - name: Please attach ISO and Poweron the nodes
+      ansible.builtin.pause:
+        prompt: "ISO attached and nodes started? (ENTER)"
+      register: confirm_apply
+      when:
+        - install_agent_baremetal
 
     - name: Wait for install complete agent based
       ansible.builtin.include_tasks: wait_for_install_completed.yml

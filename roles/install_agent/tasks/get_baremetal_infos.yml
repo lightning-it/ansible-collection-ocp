@@ -1,0 +1,15 @@
+---
+- name: Get macaddress from inventory
+  when:
+    - install_agent_baremetal | bool
+    - not install_agent_idrac | bool
+  block:
+    - name: Build vminfo entry for current host
+      ansible.builtin.set_fact:
+        current_vminfo_entry:
+          instance:
+            hw_eth0:
+              macaddress: "{{ install_agent_hw_eth0_mac | lower }}"
+            deviceName: "{{ ins_disk_path | default(omit) }}"
+          item: "{{ inventory_hostname }}"
+      when: install_agent_hw_eth0_mac is defined
