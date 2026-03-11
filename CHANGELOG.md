@@ -1,3 +1,9 @@
+## [1.3.12](https://github.com/lightning-it/ansible-collection-ocp/compare/v1.3.11...v1.3.12) (2026-03-11)
+
+### Bug Fixes
+
+* create openshift-install in disconnected envs ([7f6f83d](https://github.com/lightning-it/ansible-collection-ocp/commit/7f6f83d7a112745b6ab7b7a9ff69c7d3363ff6fc))
+
 ## [1.3.11](https://github.com/lightning-it/ansible-collection-ocp/compare/v1.3.10...v1.3.11) (2026-03-10)
 
 ### Bug Fixes
