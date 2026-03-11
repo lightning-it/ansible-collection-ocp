@@ -58,6 +58,13 @@
     - "{{ _install_agent_occlient_file }}"
   changed_when: false
 
+- name: Create imageDigestMirrorSet.yaml
+  ansible.builtin.template:
+    src: imageDigestMirrorSet.yaml.j2
+    dest: "{{ install_agent_cluster_sub_dirs.config }}/imageDigestMirrorSet.yaml"
+    mode: '0640'
+  when: install_agent_registry | bool
+
 - name: Extract openshift-install
   delegate_to: "{{ install_agent_delegate_to }}"
   run_once: true
@@ -73,6 +80,9 @@
       "{{ install_agent_download_url }}:{{ install_agent_version }}-{{ install_agent_arch }}"
       --to="{{ install_agent_cluster_sub_dirs.download }}/"
       --registry-config="$HOME/.docker/config.json"
+      {% if install_agent_registry | bool %}
+      --idms-file={{ install_agent_cluster_sub_dirs.config }}/imageDigestMirrorSet.yaml
+      {% endif %}
   register: openshift_install
   changed_when: openshift_install.rc == 0
   tags: extract_ocp_install

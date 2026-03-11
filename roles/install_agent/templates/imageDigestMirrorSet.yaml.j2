@@ -1,0 +1,13 @@
+---
+apiVersion: config.openshift.io/v1
+kind: ImageDigestMirrorSet
+metadata:
+  name: idms-config
+spec:
+  imageDigestMirrors:
+  - mirrors:
+    - {{ install_agent_registry_quayio }}/openshift-release-dev/ocp-release
+    source: quay.io/openshift-release-dev/ocp-release
+  - mirrors:
+    - {{ install_agent_registry_quayio }}/openshift-release-dev/ocp-v4.0-art-dev
+    source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
