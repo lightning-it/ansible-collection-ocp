@@ -49,6 +49,6 @@ ImageDigestSources:
     - {{ install_agent_registry_quayio }}/openshift-release-dev/ocp-release
     source: quay.io/openshift-release-dev/ocp-release
   - mirrors:
-    - eps-om-proj-prg-registry-redhat-io.artifactory.dhl.com
+    - {{ install_agent_registry_redhatio }}
     source: registry.redhat.io
 {% endif %}
