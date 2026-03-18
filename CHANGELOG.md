@@ -1,3 +1,9 @@
+## [1.3.13](https://github.com/lightning-it/ansible-collection-ocp/compare/v1.3.12...v1.3.13) (2026-03-18)
+
+### Bug Fixes
+
+* devtools containe version updated ([#68](https://github.com/lightning-it/ansible-collection-ocp/issues/68)) ([a1944d0](https://github.com/lightning-it/ansible-collection-ocp/commit/a1944d02f8de4ec622dc66435bc472f489ac339a))
+
 ## [1.3.12](https://github.com/lightning-it/ansible-collection-ocp/compare/v1.3.11...v1.3.12) (2026-03-11)
 
 ### Bug Fixes
