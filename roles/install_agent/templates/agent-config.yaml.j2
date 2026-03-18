@@ -5,7 +5,7 @@ metadata:
   name: {{ cluster_id }}
 rendezvousIP: {{ lookup('dig',groups['control'][0]) }}
 {% if install_agent_ntp_servers is defined %}
-AdditionalNTPSources: {{ install_agent_ntp_servers | map(attribute='hostname') | list }}
+additionalNTPSources: {{ install_agent_ntp_servers | map(attribute='hostname') | list }}
 {% endif %}
 hosts:
 {% for node in install_agent_create_vms_agent_based_vminfo %}
