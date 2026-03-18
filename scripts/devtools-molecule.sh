@@ -18,18 +18,7 @@ COLLECTION_NAMESPACE="${COLLECTION_NAMESPACE:-lit}"
 
 # Prefer authoritative name from galaxy.yml
 if [ -z "${COLLECTION_NAME:-}" ] && [ -f galaxy.yml ]; then
-  COLLECTION_NAME="$(python3 - <<'PY'
-import yaml
-try:
-    with open("galaxy.yml", "r", encoding="utf-8") as f:
-        data = yaml.safe_load(f) or {}
-    name = data.get("name", "")
-    if name:
-        print(name)
-except Exception:
-    pass
-PY
-  )"
+  COLLECTION_NAME="$(scripts/devtools-galaxy.sh value name galaxy.yml || true)"
 fi
 
 # Fallback: derive COLLECTION_NAME from repo name (ansible-collection-<name>)
@@ -63,6 +52,7 @@ WUNDER_DEVTOOLS_RUN_AS_HOST_UID=0 \
 COLLECTION_NAMESPACE="${COLLECTION_NAMESPACE}" \
 COLLECTION_NAME="${COLLECTION_NAME}" \
 SCENARIO_FILTER="${SCENARIO_FILTER}" \
+CONTAINER_HOME=/tmp/wunder \
 bash scripts/wunder-devtools-ee.sh bash -lc '
   set -euo pipefail
 
@@ -77,8 +67,13 @@ bash scripts/wunder-devtools-ee.sh bash -lc '
 
   echo "DEBUG: docker info inside ee-wunder-devtools-ubi9..."
   if ! docker info >/dev/null 2>&1; then
-    echo "ERROR: docker info failed inside devtools container."
-    exit 1
+    echo "WARN: docker info failed inside devtools container." >&2
+    if [ "${CI:-false}" = "true" ] || [ "${GITHUB_ACTIONS:-false}" = "true" ]; then
+      echo "ERROR: Docker is required for Molecule tests in CI." >&2
+      exit 1
+    fi
+    echo "Skipping Molecule tests because Docker is unavailable in the local devtools container." >&2
+    exit 0
   fi
 
   # -------------------------------------------------------------
@@ -100,22 +95,7 @@ bash scripts/wunder-devtools-ee.sh bash -lc '
   if [ -f /workspace/galaxy.yml ]; then
     while IFS= read -r dep_spec; do
       dep_specs+=("$dep_spec")
-    done < <(
-      python3 - <<'"PY"'
-import yaml, sys
-try:
-    with open("/workspace/galaxy.yml", "r", encoding="utf-8") as f:
-        data = yaml.safe_load(f) or {}
-    deps = data.get("dependencies") or {}
-    for fqcn, version_spec in deps.items():
-        if version_spec in (None, "", "*"):
-            print(fqcn)
-        else:
-            print(f"{fqcn}:{version_spec}")
-except Exception as exc:  # noqa: BLE001
-    sys.stderr.write(f"WARN: failed to parse galaxy.yml dependencies: {exc}\n")
-PY
-    )
+    done < <(/workspace/scripts/devtools-galaxy.sh dependencies /workspace/galaxy.yml || true)
   fi
 
   for dep_spec in "${dep_specs[@]}"; do
