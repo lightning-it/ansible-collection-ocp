@@ -22,7 +22,7 @@ tags:
 dependencies:
   ansible.posix: '*'
   ansible.utils: '*'
-  community.general: '>=11.4.5,<12.0.0'
+  community.general: '>=11.4.7,<12.0.0'
   community.docker: '*'
   kubernetes.core: '*'
   community.hashi_vault: '*'
