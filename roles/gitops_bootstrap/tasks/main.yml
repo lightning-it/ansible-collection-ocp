@@ -155,7 +155,12 @@
           item.key: item.value | combine({
             'password': lookup(
               'community.hashi_vault.hashi_vault',
-              item.value.vault_lookup
+            'secret=' ~ item.value.vault_secret,
+            url=g_vault_addr,
+            auth_method=install_agent_hashi_vault_auth_method,
+            validate_certs=install_agent_hashi_vault_validate_certs,
+            role_id=g_vault_approle | default(''),
+            secret_id=g_vault_secretid | default('')
             )
           })
         })
@@ -163,8 +168,17 @@
   loop: "{{ gitops_bootstrap_repo_templates | dict2items }}"
   when:
     - gitops_bootstrap_vault_enabled
-    - item.value.vault_lookup is defined
+    - item.value.vault_secret is defined
   no_log: true
+
+- name: Create tls config
+  delegate_to: localhost
+  run_once: true
+  kubernetes.core.k8s:
+    definition: "{{ lookup('template', 'argocd-tls-certs-cm.yml.j2') | from_yaml_all }}"
+  when:
+    - gitops_bootstrap_tls_certs is defined
+    - gitops_bootstrap_tls_certs | length > 0
 
 - name: Create repo secret templates for first deployment
   delegate_to: localhost
