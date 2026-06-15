@@ -1,3 +1,9 @@
+## [1.3.14](https://github.com/lightning-it/ansible-collection-ocp/compare/v1.3.13...v1.3.14) (2026-06-15)
+
+### Bug Fixes
+
+* update license from GPL to MIT across all relevant files ([#81](https://github.com/lightning-it/ansible-collection-ocp/issues/81)) ([4844d6d](https://github.com/lightning-it/ansible-collection-ocp/commit/4844d6d3ce89e6d8936e22877b807e3ec0e0cadc))
+
 ## [1.3.13](https://github.com/lightning-it/ansible-collection-ocp/compare/v1.3.12...v1.3.13) (2026-03-18)
 
 ### Bug Fixes
