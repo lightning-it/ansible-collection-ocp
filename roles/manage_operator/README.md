@@ -35,7 +35,7 @@ Example Playbook
 License
 -------
 
-This Ansible role is licensed under the BSD-3-Clause
+This Ansible role is licensed under the MIT
 
 Author
 ------
