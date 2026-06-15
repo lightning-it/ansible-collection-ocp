@@ -5,7 +5,7 @@ galaxy_info:
   company: Lightning IT
   role_name: manage_operator
   namespace: lit
-  license: GPL-2.0-only
+  license: MIT
   min_ansible_version: '2.1'
   galaxy_tags: []
   platforms:
