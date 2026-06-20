@@ -1,3 +1,5 @@
+# lit.ocp.manage_operator
+
 Ansible role to manage openshift operator from the operator hub
 ================================================================
 
@@ -41,3 +43,34 @@ Author
 ------
 
 Dirk Egert <github@degert-it.de>
+
+## Requirements
+
+None.
+
+## Variables
+
+See `defaults/main.yml`.
+
+## Dependencies
+
+None.
+
+## Example Playbook
+
+```yaml
+---
+- name: Use lit.ocp.manage_operator
+  hosts: all
+  become: true
+  roles:
+    - role: lit.ocp.manage_operator
+```
+
+## License
+
+MIT
+
+## Author
+
+Lightning IT

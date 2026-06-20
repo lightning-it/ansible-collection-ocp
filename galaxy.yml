@@ -29,6 +29,11 @@ dependencies:
   community.crypto: '*'
   community.vmware: '5.10.0'
 build_ignore:
+  - .ansible
+  - .cache
+  - .pytest_cache
+  - .tox
+  - .venv
   - node_modules
   - vagrant
   - .git
@@ -36,6 +41,10 @@ build_ignore:
   - .gitignore
   - .molecule
   - ansible_collections
+  - build
+  - collections
+  - dist
   - infra
+  - molecule
   - '*.terraform*'
   - '*.tar.gz'

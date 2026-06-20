@@ -35,23 +35,22 @@ If generic guidance conflicts with repository behavior, you MUST prefer reposito
    2. `SECURITY.md`
    3. `scripts/wunder-devtools-ee.sh`
 4. Managed collection baseline files from `shared-assets/ansible-collection/base`:
-   1. `AGENT.md`
-   2. `AGENTS.md`
-   3. `CONTRIBUTING.md`
-   4. `.ansible-lint`
-   5. `ansible.cfg`
-   6. `renovate.base.json`
-   7. `.releaserc`
-   8. `.yamllint`
-   9. `.gitignore`
-   10. shared block in `.pre-commit-config.yaml`
-   11. `scripts/bump_galaxy_version.py`
-   12. `scripts/devtools-ansible-lint.sh`
-   13. `scripts/devtools-collection-prepare.sh`
-   14. `scripts/devtools-collection-smoke.sh`
-   15. `scripts/devtools-galaxy-verify.sh`
-   16. `scripts/devtools-galaxy.sh`
-   17. `scripts/devtools-molecule.sh`
+   1. `AGENT.md` or downstream `AGENTS.md` when the repository uses the plural name
+   2. `CONTRIBUTING.md`
+   3. `.ansible-lint`
+   4. `ansible.cfg`
+   5. `renovate.base.json`
+   6. `.releaserc`
+   7. `.yamllint`
+   8. `.gitignore`
+   9. shared block in `.pre-commit-config.yaml`
+   10. `scripts/bump_galaxy_version.py`
+   11. `scripts/devtools-ansible-lint.sh`
+   12. `scripts/devtools-collection-prepare.sh`
+   13. `scripts/devtools-collection-smoke.sh`
+   14. `scripts/devtools-galaxy-verify.sh`
+   15. `scripts/devtools-galaxy.sh`
+   16. `scripts/devtools-molecule.sh`
 5. Repo-local exceptions MUST be explicit in the sync workflow and documented in the repository.
 
 ## 2. Repository Baseline (This Repo)
@@ -62,6 +61,27 @@ If generic guidance conflicts with repository behavior, you MUST prefer reposito
    1. `.yamllint` max line length 120
    2. `ansible-lint.yml` YAML max line length 120
 4. Pre-commit runs devtools-based hooks for `yamllint`, `ansible-lint`, and Molecule light scenarios.
+
+## 2.0.1 OCP Agent and Incus Boundary
+
+1. The OCP collection owns OpenShift install assets, Agent installer configuration, waits, and post-install cluster
+   operations.
+2. The OCP collection MUST NOT own generic Incus VM/container lifecycle logic.
+3. Incus VM/container lifecycle belongs in `lit.ubuntu.incus_instance`, or in private validation/orchestration
+   repositories that call that generic role.
+4. Incus-backed OpenShift lab installs MUST use Agent-based install with `install_agent_platform: none`.
+5. Incus is treated as external/user-provisioned infrastructure for OCP. Do not model it as a first-class OpenShift
+   platform provider inside this collection.
+6. `lit.ocp.install_agent` MUST consume provider-neutral node data through `install_agent_nodes`:
+   `hostname`, `role`, `mac`, optional `ip`, optional `interface`, optional `gateway`, optional `dns_servers`, and
+   optional `prefix_length`.
+7. Provider-specific discovery code may translate provider output into `install_agent_nodes`, but it MUST NOT duplicate
+   OCP install generation, wait, or post-install logic.
+8. VMware-specific ISO upload and power tasks MUST run only for `install_agent_provider: vsphere`.
+9. Incus ISO attachment and VM start/destroy MUST be done by `lit.ubuntu.incus_instance` or a caller playbook, not by
+   `lit.ocp.install_agent`.
+10. Private nightly matrices, secrets, and environment-specific validation for Incus OCP installs belong in
+    `modulix-validation-lit`, not in this public reusable collection.
 
 ## 2.1 Production Review Standard (Community, Red Hat, Efficiency)
 
