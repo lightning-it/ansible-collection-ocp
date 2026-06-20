@@ -102,6 +102,7 @@ bash scripts/wunder-devtools-ee.sh bash -c '
   export HOME="$(mktemp -d /tmp/ansible-lint-home.XXXXXX)"
   mkdir -p "${HOME}"
   mkdir -p "${HOME}/.ansible/tmp" "${HOME}/.ansible/collections"
+  export ANSIBLE_HOME="${HOME}/.ansible"
   export ANSIBLE_LOCAL_TEMP="${HOME}/.ansible/tmp"
   export ANSIBLE_REMOTE_TEMP="${HOME}/.ansible/tmp"
 
