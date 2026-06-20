@@ -3,40 +3,40 @@ apiVersion: v1beta1
 kind: AgentConfig
 metadata:
   name: {{ cluster_id }}
-rendezvousIP: {{ lookup('dig',groups['control'][0]) }}
+{% set rendezvous_node = install_agent_effective_nodes | first %}
+rendezvousIP: {{ install_agent_rendezvous_ip | default(rendezvous_node.ip, true) }}
 {% if install_agent_ntp_servers is defined %}
 AdditionalNTPSources: {{ install_agent_ntp_servers | map(attribute='hostname') | list }}
 {% endif %}
 hosts:
-{% for node in install_agent_create_vms_agent_based_vminfo %}
-  - hostname: {{ node.item  }}
-{% if 'control' in node.item or "etc" in node.item %}
-    role: master
-{% else %}
-    role: worker
-{% endif %}
+{% for node in install_agent_effective_nodes %}
+  - hostname: {{ node.hostname }}
+{% set node_role = node.role | default('worker') %}
+    role: {{ 'master' if node_role in ['master', 'control', 'control-plane'] else 'worker' }}
     interfaces:
-    - name: {{ install_agent_ifname }}
-      macAddress: {{ node.instance.hw_eth0.macaddress }}
+    - name: {{ node.interface | default(install_agent_ifname) }}
+      macAddress: {{ node.mac }}
+{% if node.ip | default('', true) | length > 0 %}
     networkConfig:
       interfaces:
-      - name: {{ install_agent_ifname }}
+      - name: {{ node.interface | default(install_agent_ifname) }}
         type: ethernet
         state: up
         ipv4:
           enabled: true
           address:
-            - ip: {{ lookup('pipe', 'getent hosts ' + node.item).split() | first }}
-              prefix-length: {{ install_agent_netmask_prefix }}
+            - ip: {{ node.ip }}
+              prefix-length: {{ node.prefix_length | default(install_agent_netmask_prefix) }}
           dhcp: false
         ipv6:
           enabled: false
       dns-resolver:
         config:
-          server: {{ install_agent_dns_servers }}
+          server: {{ node.dns_servers | default(install_agent_dns_servers) }}
       routes:
         config:
           - destination: 0.0.0.0/0
-            next-hop-address: {{ install_agent_gateway }}
-            next-hop-interface: {{ install_agent_ifname }}
+            next-hop-address: {{ node.gateway | default(install_agent_gateway) }}
+            next-hop-interface: {{ node.interface | default(install_agent_ifname) }}
+{% endif %}
 {% endfor %}
