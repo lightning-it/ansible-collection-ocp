@@ -33,6 +33,39 @@
         | select('defined')
         | list
       }}
+  when: install_agent_nodes | length == 0
+
+- name: Use explicit install agent nodes
+  run_once: true
+  ansible.builtin.set_fact:
+    install_agent_effective_nodes: "{{ install_agent_nodes }}"
+  when: install_agent_nodes | length > 0
+
+- name: Build install agent nodes from VMware facts
+  run_once: true
+  ansible.builtin.set_fact:
+    install_agent_effective_nodes: >-
+      {{
+        install_agent_effective_nodes
+        + [
+          {
+            'hostname': install_agent_legacy_node.item,
+            'role': (
+              'master'
+              if ('control' in install_agent_legacy_node.item or 'etc' in install_agent_legacy_node.item)
+              else 'worker'
+            ),
+            'interface': install_agent_ifname,
+            'mac': install_agent_legacy_node.instance.hw_eth0.macaddress,
+            'ip': lookup('ansible.builtin.pipe', 'getent hosts ' ~ install_agent_legacy_node.item).split() | first
+          }
+        ]
+      }}
+  loop: "{{ install_agent_create_vms_agent_based_vminfo | default([]) }}"
+  loop_control:
+    loop_var: install_agent_legacy_node
+    label: "{{ install_agent_legacy_node.item | default('install-agent-node') }}"
+  when: install_agent_nodes | length == 0
 
 - name: Create agent-config
   block:
@@ -111,14 +144,14 @@
         path: "{{ vmware_vsphere_iso_path }}"
         src: "{{ install_agent_cluster_sub_dirs.config }}/agent.x86_64.iso"
       when:
-        - not install_agent_baremetal | bool
+        - install_agent_provider == 'vsphere'
 
-    - name: Copy agent.x86_64.iso to Project dir
+    - name: Copy agent ISO to requested path
       delegate_to: "{{ install_agent_delegate_to }}"
       run_once: true
       ansible.builtin.copy:
         src: "{{ install_agent_cluster_sub_dirs.config }}/agent.x86_64.iso"
-        dest: "{{ install_agent_dir }}/project/agent-{{ cluster_id }}.x86_64.iso"
+        dest: "{{ install_agent_agent_iso_path }}"
         mode: '0644'
       when:
-        - install_agent_baremetal | bool
+        - install_agent_provider != 'vsphere'
