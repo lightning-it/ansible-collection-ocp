@@ -15,3 +15,11 @@ releases:
     fragments:
       - release-verification-2.yml
     release_date: '2026-06-22'
+  1.6.0:
+    changes:
+      minor_changes:
+        - lit.ocp - Verify automated collection release workflow after final back-sync
+          race fix.
+    fragments:
+      - release-verification-3.yml
+    release_date: '2026-06-22'
