@@ -1,12 +1,16 @@
 # ansible-collection-ocp
 
-<!-- BEGIN LIT_SHARED_RELEASE_MODEL -->
+<!-- BEGIN LIT_QUALITY_BADGES -->
 
-[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/lightning-it/ansible-collection-ocp/badge)](https://scorecard.dev/viewer/?uri=github.com/lightning-it/ansible-collection-ocp)
 [![CI](https://github.com/lightning-it/ansible-collection-ocp/actions/workflows/collection-ci.yml/badge.svg?branch=develop)](https://github.com/lightning-it/ansible-collection-ocp/actions/workflows/collection-ci.yml)
-[![Release](https://github.com/lightning-it/ansible-collection-ocp/actions/workflows/collection-publish.yml/badge.svg?branch=main)](https://github.com/lightning-it/ansible-collection-ocp/actions/workflows/collection-publish.yml)
-[![Ansible Galaxy](https://img.shields.io/badge/galaxy-lit.ocp-blue)](https://galaxy.ansible.com/ui/repo/published/lit/ocp/)
+[![Latest Release](https://img.shields.io/github/v/release/lightning-it/ansible-collection-ocp?sort=semver)](https://github.com/lightning-it/ansible-collection-ocp/releases/latest)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/lightning-it/ansible-collection-ocp/badge)](https://scorecard.dev/viewer/?uri=github.com/lightning-it/ansible-collection-ocp)
+[![Ansible Galaxy](https://img.shields.io/ansible/collection/v/lit/ocp?label=Ansible%20Galaxy)](https://galaxy.ansible.com/ui/repo/published/lit/ocp/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+
+<!-- END LIT_QUALITY_BADGES -->
+
+<!-- BEGIN LIT_SHARED_RELEASE_MODEL -->
 
 ## Release and Quality Model
 
@@ -24,6 +28,17 @@ See [RELEASE.md](./RELEASE.md) for:
 Repository classification: **Ansible Collection**.
 Required test profiles: `pre-commit, lint, light, molecule-light, molecule-heavy-incus, release-validation`.
 Publishing targets: `github-release, ansible-galaxy`.
+
+## Supported and Tested Platforms
+
+| Platform / Product | Status | Validation |
+|---|---:|---|
+| ubuntu-latest | Supported | Molecule / Incus |
+| rhel-9 | Supported | Molecule / Incus |
+| rhel-10 | Supported | Molecule / Incus |
+| ansible-core | Tested where applicable | Molecule / Incus |
+| openshift-client | Tested where applicable | Molecule / Incus |
+| incus | Tested where applicable | Molecule / Incus |
 
 <!-- END LIT_SHARED_RELEASE_MODEL -->
 Opinionated Ansible roles for Red Hat OpenShift Container Platform: cluster bring-up, day-2 operations and platform services.
