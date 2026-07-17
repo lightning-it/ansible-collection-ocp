@@ -1,0 +1,5 @@
+---
+bugfixes:
+  - >-
+    collection_tooling - Dispatch releases through protected main, use the configured Galaxy environment secret,
+    trust lint-version metadata from the managed image, and ignore generated Python and collection-install artifacts.
