@@ -1,48 +1,45 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "github>lightning-it/shared-assets//ansible-collection/base/renovate.base.json"
+    "config:recommended",
+    ":dependencyDashboard",
+    ":semanticCommits",
+    ":semanticCommitType(chore)",
+    ":semanticCommitScope(deps)"
   ],
-  "customManagers": [
-    {
-      "customType": "regex",
-      "description": "Ansible Galaxy collection dependencies in galaxy.yml (minimum version)",
-      "managerFilePatterns": ["/^galaxy\\.yml$/"],
-      "matchStrings": [
-        "(?m)^\\s{2}(?<depName>[a-z0-9_]+\\.[a-z0-9_]+):\\s*[\"']?>=(?<currentValue>[0-9]+(?:\\.[0-9]+){1,3})(?:,[^\"'\\n]+)?[\"']?"
-      ],
-      "datasourceTemplate": "galaxy-collection"
-    },
-    {
-      "customType": "regex",
-      "description": "Ansible Galaxy collection dependencies in galaxy.yml (exact version)",
-      "managerFilePatterns": ["/^galaxy\\.yml$/"],
-      "matchStrings": [
-        "(?m)^\\s{2}(?<depName>[a-z0-9_]+\\.[a-z0-9_]+):\\s*[\"']?(?<currentValue>[0-9]+(?:\\.[0-9]+){1,3})[\"']?"
-      ],
-      "datasourceTemplate": "galaxy-collection"
-    }
-  ],
+  "renovate-config": {
+    "enabled": false
+  },
+  "labels": ["dependencies", "renovate"],
+  "baseBranchPatterns": ["develop"],
+  "timezone": "UTC",
+  "schedule": [],
+  "rebaseWhen": "behind-base-branch",
+  "prConcurrentLimit": 5,
   "packageRules": [
     {
+      "description": "Automerge safe non-major updates into develop after CI passes",
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest", "pinDigest"],
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
+      "description": "Require manual approval for major updates",
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true
+    },
+    {
       "description": "Keep community.general on 11.x for linux_system_roles compatibility",
-      "matchDepNames": [
-        "community.general"
-      ],
-      "matchDatasources": [
-        "galaxy-collection"
-      ],
+      "matchDepNames": ["community.general"],
+      "matchDatasources": ["galaxy-collection"],
       "allowedVersions": "/^11\\./"
     },
     {
       "description": "Pin community.vmware to 5.10.0 for ansible-core 2.18.13 compatibility",
-      "matchDepNames": [
-        "community.vmware"
-      ],
-      "matchDatasources": [
-        "galaxy-collection"
-      ],
+      "matchDepNames": ["community.vmware"],
+      "matchDatasources": ["galaxy-collection"],
       "allowedVersions": "/^5\\.10\\.0$/"
     }
-  ]
+  ],
+  "customManagers": []
 }

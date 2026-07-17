@@ -3,11 +3,18 @@
 install_agent_skip: false
 install_agent_delegate_to: localhost
 install_agent_dir: /runner
+install_agent_provider: vsphere
 install_agent_platform: vsphere
 install_agent_kubeconfig_dir: '~/.kube'
+install_agent_run_assets: true
+install_agent_run_wait: true
+install_agent_run_post: true
+install_agent_run_setup_nodes: true
+install_agent_power_on_nodes: true
+install_agent_write_kube_credentials: true
 
 # vsphere config
-install_agent_vsphere: true
+install_agent_vsphere: "{{ install_agent_provider == 'vsphere' }}"
 install_agent_vcenter_hostname:
 install_agent_vcenter_password:
 install_agent_vcenter_username:
@@ -26,6 +33,17 @@ install_agent_idrac: false
 # ocp config
 install_agent_base_domain: ''
 install_agent_cluster_name:
+install_agent_control_plane_replicas: 3
+install_agent_compute_replicas: >-
+  {{
+    (groups['compute'] | default([]) | length)
+    + (groups['infra'] | default([]) | length)
+  }}
+install_agent_nodes: []
+install_agent_effective_nodes: []
+install_agent_rendezvous_ip: ''
+install_agent_agent_iso_path: >-
+  {{ install_agent_dir }}/project/agent-{{ cluster_id }}.{{ install_agent_arch }}.iso
 install_agent_vault_path: >-
   {{
     cluster_id

@@ -60,23 +60,29 @@
   block:
     - name: Prepare OCP install
       ansible.builtin.include_tasks: prepare_ocp4.yml
+      when: install_agent_run_assets | bool
 
     - name: Maintain SSH keys
       ansible.builtin.include_tasks: maintain_ssh_keys.yml
+      when: install_agent_run_assets | bool
 
     - name: Manage install config
       ansible.builtin.include_tasks: manage_install_config.yml
+      when: install_agent_run_assets | bool
 
     - name: Manage agent config
       ansible.builtin.include_tasks: manage_agent_config.yml
+      when: install_agent_run_assets | bool
 
     - name: Maintain kube credentials
       ansible.builtin.include_tasks: maintain_kube_creds.yml
+      when: install_agent_write_kube_credentials | bool
 
     - name: Poweron VMs
       ansible.builtin.include_tasks: power_on_vms.yml
       when:
-        - not install_agent_baremetal or install_agent_idrac
+        - install_agent_power_on_nodes | bool
+        - install_agent_provider == 'vsphere' or (install_agent_provider == 'baremetal' and install_agent_idrac)
 
     - name: Please attach ISO and Poweron the nodes
       ansible.builtin.pause:
@@ -87,11 +93,14 @@
 
     - name: Wait for install complete agent based
       ansible.builtin.include_tasks: wait_for_install_completed.yml
+      when: install_agent_run_wait | bool
 
 - name: Post Install
   ansible.builtin.include_tasks: post_ocp.yml
+  when: install_agent_run_post | bool
   tags: install_agent_post
 
 - name: Setup Infra and App Nodes
   ansible.builtin.import_tasks: setup_nodes.yml
+  when: install_agent_run_setup_nodes | bool
   tags: install_agent_infra

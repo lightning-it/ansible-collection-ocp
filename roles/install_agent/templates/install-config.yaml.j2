@@ -11,13 +11,13 @@ compute:
     hyperthreading: Enabled
     name: worker
     platform: {}
-    replicas: {{ groups['compute'] | length + groups['infra'] | length }}
+    replicas: {{ install_agent_compute_replicas }}
 controlPlane:
   architecture: amd64
   hyperthreading: Enabled
   name: master
   platform: {}
-  replicas: 3
+  replicas: {{ install_agent_control_plane_replicas }}
 metadata:
   name: {{ install_agent_cluster_name }}
 networking:
