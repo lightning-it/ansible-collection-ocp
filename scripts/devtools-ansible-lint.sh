@@ -52,14 +52,10 @@ else:
 PY
 )}"
 
-ANSIBLE_LINT_VERSION="${ANSIBLE_LINT_VERSION:-$(python3 - <<'PY'
-try:
-    import ansiblelint  # type: ignore
-    print(getattr(ansiblelint, "__version__", ""))
-except Exception:
-    print("")
-PY
-)}"
+# The lint process runs inside the managed devtools image, so a host-side
+# ansible-lint installation is not authoritative. CI supplies the image version;
+# local callers leave it empty and the compatibility branch below fails safe.
+ANSIBLE_LINT_VERSION="${ANSIBLE_LINT_VERSION:-}"
 
 ANSIBLE_LINT_SKIP_META_RUNTIME=0
 if [ -n "${REQUIRES_ANSIBLE:-}" ]; then
@@ -99,9 +95,10 @@ bash scripts/wunder-devtools-ee.sh bash -c '
   name="${COLLECTION_NAME}"
 
   # Keep Ansible cache/install state stable and outside /workspace.
-  export HOME="${HOME:-/tmp/wunder}"
+  export HOME="$(mktemp -d /tmp/ansible-lint-home.XXXXXX)"
   mkdir -p "${HOME}"
   mkdir -p "${HOME}/.ansible/tmp" "${HOME}/.ansible/collections"
+  export ANSIBLE_HOME="${HOME}/.ansible"
   export ANSIBLE_LOCAL_TEMP="${HOME}/.ansible/tmp"
   export ANSIBLE_REMOTE_TEMP="${HOME}/.ansible/tmp"
 
@@ -129,6 +126,10 @@ bash scripts/wunder-devtools-ee.sh bash -c '
   stale_collection_dir="${HOME}/.ansible/collections/ansible_collections/${ns}/${name}"
   if [ -d "$stale_collection_dir" ]; then
     rm -rf "$stale_collection_dir"
+  fi
+  workspace_stale_collection_dir="/workspace/.ansible/collections/ansible_collections/${ns}/${name}"
+  if [ -d "$workspace_stale_collection_dir" ]; then
+    rm -rf "$workspace_stale_collection_dir"
   fi
 
   export ANSIBLE_CONFIG="/workspace/ansible.cfg"

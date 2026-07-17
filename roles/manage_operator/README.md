@@ -1,3 +1,5 @@
+# lit.ocp.manage_operator
+
 Ansible role to manage openshift operator from the operator hub
 ================================================================
 
@@ -35,9 +37,40 @@ Example Playbook
 License
 -------
 
-This Ansible role is licensed under the BSD-3-Clause
+This Ansible role is licensed under the MIT
 
 Author
 ------
 
 Dirk Egert <github@degert-it.de>
+
+## Requirements
+
+None.
+
+## Variables
+
+See `defaults/main.yml`.
+
+## Dependencies
+
+None.
+
+## Example Playbook
+
+```yaml
+---
+- name: Use lit.ocp.manage_operator
+  hosts: all
+  become: true
+  roles:
+    - role: lit.ocp.manage_operator
+```
+
+## License
+
+MIT
+
+## Author
+
+Lightning IT

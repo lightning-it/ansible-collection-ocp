@@ -2,6 +2,10 @@
 
 Front-door role for installing OpenShift in the `lit.ocp` collection. Dispatches to method-specific roles based on `install_method`. Legacy `ocp_install_*` inputs remain accepted.
 
+## Requirements
+
+None.
+
 ## Variables
 
 - `install_method`: installation approach; supported values: `upi`, `agent` (default: `agent`).
@@ -14,7 +18,32 @@ Method-specific variables live in the implementation roles:
 - `install_upi_*` for UPI (legacy `ocp_install_upi_*` still accepted)
 - `install_agent_*` for agent-based installs
 
-## Examples
+## Dependencies
+
+None.
+
+## Example Playbook
+
+```yaml
+---
+- name: Use lit.ocp.install
+  hosts: all
+  become: true
+  roles:
+    - role: lit.ocp.install
+```
+
+## License
+
+MIT
+
+## Author
+
+Lightning IT
+
+## Additional Notes
+
+### Examples
 
 ```yaml
 - name: Install OCP via UPI

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-IMAGE="quay.io/l-it/ee-wunder-devtools-ubi9:v1.8.3"
+IMAGE="quay.io/l-it/ee-wunder-devtools-ubi9:v1.9.2"
 CONTAINER_HOME="${CONTAINER_HOME:-/tmp/wunder}"
 HOST_HOME_CACHE_ROOT="${XDG_CACHE_HOME:-$HOME/.cache}/wunder-devtools-ee/v2/home"
 HOST_HOME_CACHE_SCOPE="host-uid-$(id -u)"
@@ -68,13 +68,45 @@ case "$CONTAINER_BIN" in
     ;;
 esac
 
+if [ "${WUNDER_DEVTOOLS_PRIVILEGED:-0}" = "1" ]; then
+  DOCKER_ARGS+=(--privileged)
+fi
+
 if [ "$CONTAINER_BIN" = "podman" ] && [ "$(uname -s)" = "Linux" ]; then
-  WORKSPACE_MOUNT="${WORKSPACE_MOUNT}:Z"
-  HOME_CACHE_MOUNT="${HOME_CACHE_MOUNT}:Z"
+  WORKSPACE_MOUNT="${WORKSPACE_MOUNT}:z"
+  HOME_CACHE_MOUNT="${HOME_CACHE_MOUNT}:z"
 fi
 
 DOCKER_ARGS+=(-v "$WORKSPACE_MOUNT")
 DOCKER_ARGS+=(-v "$HOME_CACHE_MOUNT")
+
+WORKSPACE_REAL="$(pwd -P)"
+DOCKER_ARGS+=(-e "WUNDER_DEVTOOLS_HOST_WORKSPACE=${WORKSPACE_REAL}")
+SOURCE_ROOT_HOST="${WUNDER_DEVTOOLS_SOURCE_ROOT_HOST:-${WUNDER_DEVTOOLS_SOURCE_ROOT:-}}"
+if [ -z "${SOURCE_ROOT_HOST:-}" ]; then
+  SOURCE_ROOT_HOST="$(cd "${WORKSPACE_REAL}/.." && pwd -P)"
+fi
+SOURCE_ROOT_CONTAINER="${WUNDER_DEVTOOLS_SOURCE_ROOT_CONTAINER:-/sources}"
+mounted_source_root=0
+if [ -d "$SOURCE_ROOT_HOST" ]; then
+  shopt -s nullglob
+  for collection_dir in "$SOURCE_ROOT_HOST"/ansible-collection-*; do
+    [ -d "$collection_dir" ] || continue
+    collection_real="$(cd "$collection_dir" && pwd -P)"
+    [ "$collection_real" = "$WORKSPACE_REAL" ] && continue
+    collection_base="$(basename "$collection_real")"
+    collection_mount="${collection_real}:${SOURCE_ROOT_CONTAINER}/${collection_base}:ro"
+    if [ "$CONTAINER_BIN" = "podman" ] && [ "$(uname -s)" = "Linux" ]; then
+      collection_mount="${collection_mount},z"
+    fi
+    DOCKER_ARGS+=(-v "$collection_mount")
+    mounted_source_root=1
+  done
+  shopt -u nullglob
+fi
+if [ "$mounted_source_root" = "1" ]; then
+  DOCKER_ARGS+=(-e "WUNDER_DEVTOOLS_SOURCE_ROOT=${SOURCE_ROOT_CONTAINER}")
+fi
 
 PODMAN_ROOTLESS=0
 if [ "$CONTAINER_BIN" = "podman" ]; then
@@ -111,6 +143,7 @@ PY
 
   DOCKER_ARGS+=(-v "$DOCKER_SOCKET_REAL":/var/run/docker.sock)
   DOCKER_ARGS+=(-e DOCKER_HOST=unix:///var/run/docker.sock)
+  DOCKER_ARGS+=(-e "WUNDER_DEVTOOLS_DOCKER_SOCKET_HOST=${DOCKER_SOCKET_REAL}")
 
   DOCKER_ARGS+=(
     -e HTTP_PROXY=
@@ -151,7 +184,8 @@ if [ "$CONTAINER_BIN" = "docker" ]; then
   else
     sanitize_docker_host_env
     if [ -z "${DOCKER_HOST:-}" ] && [ -S "/run/user/$(id -u)/podman/podman.sock" ]; then
-      export DOCKER_HOST="unix:///run/user/$(id -u)/podman/podman.sock"
+      DOCKER_HOST="unix:///run/user/$(id -u)/podman/podman.sock"
+      export DOCKER_HOST
     fi
   fi
 fi
@@ -166,8 +200,22 @@ fi
   ${ANSIBLE_LINT_SKIP_META_RUNTIME:+-e ANSIBLE_LINT_SKIP_META_RUNTIME} \
   ${COLLECTION_NAMESPACE:+-e COLLECTION_NAMESPACE} \
   ${COLLECTION_NAME:+-e COLLECTION_NAME} \
+  ${SCENARIO_FILTER:+-e SCENARIO_FILTER} \
   ${EXAMPLE_PLAYBOOK:+-e EXAMPLE_PLAYBOOK} \
   ${MOLECULE_NO_LOG:+-e MOLECULE_NO_LOG} \
+  ${BASE_SHA:+-e BASE_SHA} \
+  ${HEAD_SHA:+-e HEAD_SHA} \
+  ${LABELS_JSON:+-e LABELS_JSON} \
+  ${REQUIRE_FRAGMENT:+-e REQUIRE_FRAGMENT} \
+  ${GITHUB_HEAD_REF:+-e GITHUB_HEAD_REF} \
+  ${GITHUB_BASE_REF:+-e GITHUB_BASE_REF} \
+  ${PRE_COMMIT_FROM_REF:+-e PRE_COMMIT_FROM_REF} \
+  ${PRE_COMMIT_TO_REF:+-e PRE_COMMIT_TO_REF} \
+  ${CHANGELOG_BASE_REF:+-e CHANGELOG_BASE_REF} \
+  ${GH_TOKEN:+-e GH_TOKEN} \
+  ${GITHUB_TOKEN:+-e GITHUB_TOKEN} \
+  ${CI:+-e CI} \
+  ${GITHUB_ACTIONS:+-e GITHUB_ACTIONS} \
   ${VAGRANT_SSH_HOST:+-e VAGRANT_SSH_HOST} \
   ${VAGRANT_SSH_PORT:+-e VAGRANT_SSH_PORT} \
   ${VAGRANT_SSH_USER:+-e VAGRANT_SSH_USER} \

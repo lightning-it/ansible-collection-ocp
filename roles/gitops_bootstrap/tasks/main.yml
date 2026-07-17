@@ -145,7 +145,7 @@
           name: openshift-gitops-argocd-application-controller
           namespace: openshift-gitops
 
-- name: Fetch repo passwords from Vault
+- name: Fetch repo passwords from Vault lookup strings
   delegate_to: localhost
   run_once: true
   ansible.builtin.set_fact:
@@ -155,12 +155,34 @@
           item.key: item.value | combine({
             'password': lookup(
               'community.hashi_vault.hashi_vault',
-            'secret=' ~ item.value.vault_secret,
-            url=g_vault_addr,
-            auth_method=install_agent_hashi_vault_auth_method,
-            validate_certs=install_agent_hashi_vault_validate_certs,
-            role_id=g_vault_approle | default(''),
-            secret_id=g_vault_secretid | default('')
+              item.value.vault_lookup
+            )
+          })
+        })
+      }}
+  loop: "{{ gitops_bootstrap_repo_templates | dict2items }}"
+  when:
+    - gitops_bootstrap_vault_enabled
+    - item.value.vault_lookup is defined
+    - item.value.vault_secret is not defined
+  no_log: true
+
+- name: Fetch repo passwords from Vault secret paths
+  delegate_to: localhost
+  run_once: true
+  ansible.builtin.set_fact:
+    gitops_bootstrap_repo_templates: >-
+      {{
+        gitops_bootstrap_repo_templates | combine({
+          item.key: item.value | combine({
+            'password': lookup(
+              'community.hashi_vault.hashi_vault',
+              'secret=' ~ item.value.vault_secret,
+              url=g_vault_addr,
+              auth_method=gitops_bootstrap_hashi_vault_auth_method,
+              validate_certs=gitops_bootstrap_hashi_vault_validate_certs,
+              role_id=g_vault_approle | default(''),
+              secret_id=g_vault_secretid | default('')
             )
           })
         })
