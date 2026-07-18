@@ -39,7 +39,7 @@
     url: "{{ install_agent_occlient }}"
     dest: "{{ install_agent_cluster_sub_dirs.download }}"
     mode: '0644'
-  when: not install_agent_skip_download | bool
+  when: not (install_agent_skip_download | bool)
 
 - name: Unarchive ocp tools
   delegate_to: "{{ install_agent_delegate_to }}"
