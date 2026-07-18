@@ -190,7 +190,7 @@
   loop: "{{ gitops_bootstrap_repo_templates | dict2items }}"
   when:
     - gitops_bootstrap_vault_enabled
-    - item.value.vault_secret is defined
+    - item.value.vault_secret | default('', true) | trim | length > 0
   no_log: true
 
 - name: Create tls config
