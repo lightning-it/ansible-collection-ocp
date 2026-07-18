@@ -165,6 +165,7 @@
     - gitops_bootstrap_vault_enabled
     - item.value.vault_lookup is defined
     - item.value.vault_secret is not defined
+    - item.value.password | default('', true) | trim | length == 0
   no_log: true
 
 - name: Fetch repo passwords from Vault secret paths
