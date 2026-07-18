@@ -195,6 +195,22 @@
     - item.value.password | default('', true) | trim | length == 0
   no_log: true
 
+- name: Validate gitops_bootstrap_tls_certs entries
+  delegate_to: localhost
+  run_once: true
+  ansible.builtin.assert:
+    that:
+      - item.url is defined
+      - item.url | default('', true) | trim | length > 0
+      - item.cert is defined
+      - item.cert | default('', true) | trim | length > 0
+    fail_msg: >-
+      Each gitops_bootstrap_tls_certs entry must include non-empty 'url' and 'cert' keys.
+  loop: "{{ gitops_bootstrap_tls_certs }}"
+  when:
+    - gitops_bootstrap_tls_certs is defined
+    - gitops_bootstrap_tls_certs | length > 0
+
 - name: Create tls config
   delegate_to: localhost
   run_once: true
@@ -203,7 +219,6 @@
   when:
     - gitops_bootstrap_tls_certs is defined
     - gitops_bootstrap_tls_certs | length > 0
-
 - name: Create repo secret templates for first deployment
   delegate_to: localhost
   run_once: true
