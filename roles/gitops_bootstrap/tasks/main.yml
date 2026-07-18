@@ -177,7 +177,7 @@
           item.key: item.value | combine({
             'password': lookup(
               'community.hashi_vault.hashi_vault',
-              'secret=' ~ item.value.vault_secret,
+              'secret=' ~ (item.value.vault_secret if (':' in item.value.vault_secret) else (item.value.vault_secret ~ ':password')),
               url=g_vault_addr,
               auth_method=gitops_bootstrap_hashi_vault_auth_method,
               validate_certs=gitops_bootstrap_hashi_vault_validate_certs,
