@@ -60,6 +60,25 @@
   changed_when: false
   when: not (install_agent_skip_download | bool)
 
+- name: Check staged oc binary when download is skipped
+  delegate_to: "{{ install_agent_delegate_to }}"
+  run_once: true
+  ansible.builtin.stat:
+    path: "{{ install_agent_cluster_sub_dirs.bin }}/oc"
+  register: install_agent_oc_binary
+  when: install_agent_skip_download | bool
+
+- name: Fail if staged oc binary is missing when download is skipped
+  delegate_to: "{{ install_agent_delegate_to }}"
+  run_once: true
+  ansible.builtin.fail:
+    msg: >-
+      install_agent_skip_download is true, but {{ install_agent_cluster_sub_dirs.bin }}/oc was not found.
+      Stage the oc binary at this path on {{ install_agent_delegate_to }} or set install_agent_skip_download to false.
+  when:
+    - install_agent_skip_download | bool
+    - not install_agent_oc_binary.stat.exists
+
 - name: Create imageDigestMirrorSet.yaml
   ansible.builtin.template:
     src: imageDigestMirrorSet.yaml.j2
