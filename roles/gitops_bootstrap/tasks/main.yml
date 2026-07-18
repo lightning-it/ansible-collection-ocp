@@ -192,6 +192,7 @@
   when:
     - gitops_bootstrap_vault_enabled
     - item.value.vault_secret | default('', true) | trim | length > 0
+    - item.value.password | default('', true) | trim | length == 0
   no_log: true
 
 - name: Create tls config
