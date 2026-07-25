@@ -103,6 +103,16 @@
   ansible.builtin.meta: end_play
   when: gitops_bootstrap_skip | bool
 
+- name: Validate gitops repository URL
+  delegate_to: localhost
+  run_once: true
+  ansible.builtin.assert:
+    that:
+      - gitops_bootstrap_git_repo_url | trim | length > 0
+    fail_msg: >-
+      gitops_bootstrap_git_repo_url must be a non-empty repository URL.
+  when: gitops_bootstrap_operator_state != 'absent'
+
 - name: Manage gitops operator
   run_once: true
   vars:
@@ -163,11 +173,9 @@
   loop: "{{ gitops_bootstrap_repo_templates | dict2items }}"
   when:
     - gitops_bootstrap_vault_enabled | bool
-    - item.value.vault_lookup is defined
-    - item.value.vault_lookup | trim | length > 0
+    - item.value.vault_lookup | default('', true) | trim | length > 0
     - >-
-      item.value.vault_secret is not defined
-      or item.value.vault_secret | trim | length == 0
+      item.value.vault_secret | default('', true) | trim | length == 0
     - item.value.password | default('', true) | trim | length == 0
   no_log: true
 
@@ -209,6 +217,14 @@
     that:
       - item.url is defined
       - item.url | default('', true) | trim | length > 0
+      - >-
+        item.url
+        | default('', true)
+        | trim
+        | regex_replace('^https?://', '')
+        | regex_replace('/.*$', '')
+        | regex_replace(':\d+$', '')
+        | length > 0
       - item.cert is defined
       - item.cert | default('', true) | trim | length > 0
     fail_msg: >-
