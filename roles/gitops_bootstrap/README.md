@@ -10,6 +10,8 @@ None.
 
 - `gitops_bootstrap_operator_*`: tune the Subscription (channel, source, starting CSV, approval, extras).
 - `gitops_bootstrap_operator_state` / `gitops_bootstrap_argocd_state`: control whether the operator/App-of-Apps exist (default `present`).
+- `gitops_bootstrap_git_repo_url`: full repository URL used as the App-of-Apps
+  `Application.spec.source.repoURL`; the role does not append a repository name.
 - `gitops_bootstrap_repo_templates`: dictionary describing Git credentials to render into secrets; supports complete
   `vault_lookup` terms and `vault_secret` lookup targets in `<path>:<field>` form when
   `gitops_bootstrap_vault_enabled: true`.
