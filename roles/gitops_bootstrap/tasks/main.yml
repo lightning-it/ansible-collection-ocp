@@ -103,6 +103,16 @@
   ansible.builtin.meta: end_play
   when: gitops_bootstrap_skip | bool
 
+- name: Validate App-of-Apps repository URL
+  run_once: true
+  tags: always
+  ansible.builtin.assert:
+    that:
+      - gitops_bootstrap_git_repo_url | trim | length > 0
+    fail_msg: >-
+      gitops_bootstrap_git_repo_url must contain the full App-of-Apps
+      repository URL.
+
 - name: Manage gitops operator
   run_once: true
   vars:
@@ -145,7 +155,25 @@
           name: openshift-gitops-argocd-application-controller
           namespace: openshift-gitops
 
-- name: Fetch repo passwords from Vault
+- name: Reject ambiguous repository Vault password sources
+  run_once: true
+  ansible.builtin.assert:
+    that:
+      - >-
+        not (
+          item.value.vault_lookup | default('', true) | trim | length > 0
+          and
+          item.value.vault_secret | default('', true) | trim | length > 0
+        )
+    fail_msg: >-
+      Repository template {{ item.key }} must define only one of
+      vault_lookup or vault_secret.
+  loop: "{{ gitops_bootstrap_repo_templates | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  when: gitops_bootstrap_vault_enabled | bool
+
+- name: Fetch repo passwords from Vault lookup strings
   delegate_to: localhost
   run_once: true
   ansible.builtin.set_fact:
@@ -155,15 +183,47 @@
           item.key: item.value | combine({
             'password': lookup(
               'community.hashi_vault.hashi_vault',
-              item.value.vault_lookup
+              item.value.vault_lookup | default('', true) | trim
             )
           })
         })
       }}
   loop: "{{ gitops_bootstrap_repo_templates | dict2items }}"
   when:
-    - gitops_bootstrap_vault_enabled
-    - item.value.vault_lookup is defined
+    - gitops_bootstrap_vault_enabled | bool
+    - item.value.vault_lookup | default('', true) | trim | length > 0
+    - >-
+      item.value.vault_secret | default('', true) | trim | length == 0
+  no_log: true
+
+- name: Fetch repo passwords from Vault secret paths
+  delegate_to: localhost
+  run_once: true
+  ansible.builtin.set_fact:
+    gitops_bootstrap_repo_templates: >-
+      {{
+        gitops_bootstrap_repo_templates | combine({
+          item.key: item.value | combine({
+            'password': lookup(
+              'community.hashi_vault.hashi_vault',
+              'secret=' ~ (
+                item.value.vault_secret | default('', true) | trim
+              )
+              ~ ' url=' ~ g_vault_addr
+              ~ ' auth_method=' ~ gitops_bootstrap_hashi_vault_auth_method
+              ~ ' validate_certs=' ~ (
+                gitops_bootstrap_hashi_vault_validate_certs | string
+              )
+              ~ ' role_id=' ~ (g_vault_approle | default(''))
+              ~ ' secret_id=' ~ (g_vault_secretid | default(''))
+            )
+          })
+        })
+      }}
+  loop: "{{ gitops_bootstrap_repo_templates | dict2items }}"
+  when:
+    - gitops_bootstrap_vault_enabled | bool
+    - item.value.vault_secret | default('', true) | trim | length > 0
   no_log: true
 
 - name: Create repo secret templates for first deployment
