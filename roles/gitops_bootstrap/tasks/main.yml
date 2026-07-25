@@ -103,15 +103,11 @@
   ansible.builtin.meta: end_play
   when: gitops_bootstrap_skip | bool
 
-- name: Validate gitops repository URL
-  delegate_to: localhost
+- name: Validate gitops bootstrap inputs
   run_once: true
-  ansible.builtin.assert:
-    that:
-      - gitops_bootstrap_git_repo_url | trim | length > 0
-    fail_msg: >-
-      gitops_bootstrap_git_repo_url must be a non-empty repository URL.
-  when: gitops_bootstrap_operator_state != 'absent'
+  ansible.builtin.import_tasks: assert.yml
+  tags:
+    - always
 
 - name: Manage gitops operator
   run_once: true
@@ -209,31 +205,6 @@
     - item.value.vault_secret | default('', true) | trim | length > 0
     - item.value.password | default('', true) | trim | length == 0
   no_log: true
-
-- name: Validate gitops_bootstrap_tls_certs entries
-  delegate_to: localhost
-  run_once: true
-  ansible.builtin.assert:
-    that:
-      - item.url is defined
-      - item.url | default('', true) | trim | length > 0
-      - >-
-        item.url
-        | default('', true)
-        | trim
-        | regex_replace('^https?://', '')
-        | regex_replace('/.*$', '')
-        | regex_replace(':\d+$', '')
-        | length > 0
-      - item.cert is defined
-      - item.cert | default('', true) | trim | length > 0
-    fail_msg: >-
-      Each gitops_bootstrap_tls_certs entry must include non-empty 'url' and 'cert' keys.
-  loop: "{{ gitops_bootstrap_tls_certs }}"
-  when:
-    - gitops_bootstrap_operator_state != 'absent'
-    - gitops_bootstrap_tls_certs is defined
-    - gitops_bootstrap_tls_certs | length > 0
 
 - name: Create tls config
   delegate_to: localhost

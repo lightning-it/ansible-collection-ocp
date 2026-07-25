@@ -1,0 +1,34 @@
+---
+- name: Validate gitops repository URL
+  delegate_to: localhost
+  ansible.builtin.assert:
+    that:
+      - gitops_bootstrap_git_repo_url | trim | length > 0
+    fail_msg: >-
+      gitops_bootstrap_git_repo_url must be a non-empty repository URL.
+  when: gitops_bootstrap_operator_state != 'absent'
+
+- name: Validate gitops_bootstrap_tls_certs entries
+  delegate_to: localhost
+  ansible.builtin.assert:
+    that:
+      - item.url is defined
+      - item.url | default('', true) | trim | length > 0
+      - >-
+        item.url
+        | default('', true)
+        | trim
+        | regex_replace('^https?://', '')
+        | regex_replace('/.*$', '')
+        | regex_replace(':\d+$', '')
+        | length > 0
+      - item.cert is defined
+      - item.cert | default('', true) | trim | length > 0
+    fail_msg: >-
+      Each gitops_bootstrap_tls_certs entry must include non-empty 'url' and
+      'cert' keys.
+  loop: "{{ gitops_bootstrap_tls_certs }}"
+  when:
+    - gitops_bootstrap_operator_state != 'absent'
+    - gitops_bootstrap_tls_certs is defined
+    - gitops_bootstrap_tls_certs | length > 0
