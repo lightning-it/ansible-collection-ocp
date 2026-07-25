@@ -1,5 +1,6 @@
 ---
 - name: Validate gitops repository URL
+  run_once: true
   delegate_to: localhost
   ansible.builtin.assert:
     that:
@@ -9,6 +10,7 @@
   when: gitops_bootstrap_operator_state != 'absent'
 
 - name: Reject ambiguous repository Vault password sources
+  run_once: true
   ansible.builtin.assert:
     that:
       - >-
@@ -28,6 +30,7 @@
     - gitops_bootstrap_vault_enabled | bool
 
 - name: Validate gitops_bootstrap_tls_certs entries
+  run_once: true
   delegate_to: localhost
   ansible.builtin.assert:
     that:
@@ -62,6 +65,7 @@
     - gitops_bootstrap_tls_certs | length > 0
 
 - name: Reject duplicate normalized TLS certificate hosts
+  run_once: true
   delegate_to: localhost
   vars:
     gitops_bootstrap_normalized_tls_hosts: >-
