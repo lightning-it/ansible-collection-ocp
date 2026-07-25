@@ -215,6 +215,7 @@
       Each gitops_bootstrap_tls_certs entry must include non-empty 'url' and 'cert' keys.
   loop: "{{ gitops_bootstrap_tls_certs }}"
   when:
+    - gitops_bootstrap_operator_state != 'absent'
     - gitops_bootstrap_tls_certs is defined
     - gitops_bootstrap_tls_certs | length > 0
 
@@ -225,8 +226,10 @@
     state: present
     definition: "{{ lookup('template', 'argocd-tls-certs-cm.yml.j2') | from_yaml_all }}"
   when:
+    - gitops_bootstrap_operator_state != 'absent'
     - gitops_bootstrap_tls_certs is defined
     - gitops_bootstrap_tls_certs | length > 0
+
 - name: Create repo secret templates for first deployment
   delegate_to: localhost
   run_once: true
