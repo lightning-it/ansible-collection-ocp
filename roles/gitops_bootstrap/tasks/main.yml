@@ -186,9 +186,9 @@
             'password': lookup(
               'community.hashi_vault.hashi_vault',
               'secret=' ~ (
-                item.value.vault_secret
-                if ':' in item.value.vault_secret
-                else item.value.vault_secret ~ ':password'
+                _gitops_bootstrap_vault_secret
+                if ':' in _gitops_bootstrap_vault_secret
+                else _gitops_bootstrap_vault_secret ~ ':password'
               ),
               url=g_vault_addr,
               auth_method=gitops_bootstrap_hashi_vault_auth_method,
@@ -204,6 +204,8 @@
     - gitops_bootstrap_vault_enabled | bool
     - item.value.vault_secret | default('', true) | trim | length > 0
     - item.value.password | default('', true) | trim | length == 0
+  vars:
+    _gitops_bootstrap_vault_secret: "{{ item.value.vault_secret | trim }}"
   no_log: true
 
 - name: Create tls config
