@@ -22,6 +22,15 @@
         | regex_replace('/.*$', '')
         | regex_replace(':\d+$', '')
         | length > 0
+      - >-
+        (
+          item.url
+          | default('', true)
+          | trim
+          | regex_replace('^https?://', '')
+          | regex_replace('/.*$', '')
+          | regex_replace(':\d+$', '')
+        ) is match('^[-._a-zA-Z0-9]+$')
       - item.cert is defined
       - item.cert | default('', true) | trim | length > 0
     fail_msg: >-
