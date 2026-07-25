@@ -23,7 +23,9 @@
   loop: "{{ gitops_bootstrap_repo_templates | dict2items }}"
   loop_control:
     label: "{{ item.key }}"
-  when: gitops_bootstrap_vault_enabled | bool
+  when:
+    - gitops_bootstrap_operator_state != 'absent'
+    - gitops_bootstrap_vault_enabled | bool
 
 - name: Validate gitops_bootstrap_tls_certs entries
   delegate_to: localhost
