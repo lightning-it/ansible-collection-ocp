@@ -58,3 +58,29 @@
     - gitops_bootstrap_operator_state != 'absent'
     - gitops_bootstrap_tls_certs is defined
     - gitops_bootstrap_tls_certs | length > 0
+
+- name: Reject duplicate normalized TLS certificate hosts
+  delegate_to: localhost
+  vars:
+    gitops_bootstrap_normalized_tls_hosts: >-
+      {{
+        gitops_bootstrap_tls_certs
+        | map(attribute='url')
+        | map('trim')
+        | map('regex_replace', '^https?://', '')
+        | map('regex_replace', '/.*$', '')
+        | map('regex_replace', ':\d+$', '')
+        | list
+      }}
+  ansible.builtin.assert:
+    that:
+      - >-
+        gitops_bootstrap_normalized_tls_hosts | unique | length
+        ==
+        gitops_bootstrap_normalized_tls_hosts | length
+    fail_msg: >-
+      gitops_bootstrap_tls_certs URLs must normalize to unique host names.
+  when:
+    - gitops_bootstrap_operator_state != 'absent'
+    - gitops_bootstrap_tls_certs is defined
+    - gitops_bootstrap_tls_certs | length > 0
