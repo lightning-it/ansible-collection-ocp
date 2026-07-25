@@ -12,65 +12,60 @@ on:
         required: true
 
 permissions:
-  contents: write
-  issues: write
-  pull-requests: write
+  contents: read
 
 jobs:
   back-sync:
     name: Open release back-sync PR
     runs-on: ubuntu-latest
-    env:
-      RELEASE_BOT_APP_ID: ${{ secrets.RELEASE_BOT_APP_ID }}
-      RELEASE_BOT_PRIVATE_KEY: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
 
     steps:
-      - name: Create GitHub App token
-        id: app-token
-        if: ${{ env.RELEASE_BOT_APP_ID != '' && env.RELEASE_BOT_PRIVATE_KEY != '' }}
-        uses: actions/create-github-app-token@v3
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
         with:
-          app-id: ${{ env.RELEASE_BOT_APP_ID }}
-          private-key: ${{ env.RELEASE_BOT_PRIVATE_KEY }}
-          owner: ${{ github.repository_owner }}
-          repositories: ${{ github.event.repository.name }}
+          fetch-depth: 0
+          persist-credentials: false
 
-      - name: Resolve release token
-        id: token
+      - name: Mint release automation App token
+        id: release-app
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1  # v3.2.0
+        with:
+          client-id: ${{ vars.RELEASE_AUTOMATION_APP_CLIENT_ID }}
+          private-key: ${{ secrets.RELEASE_AUTOMATION_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Resolve release automation App bot identity
+        id: release-bot
         env:
-          APP_TOKEN: ${{ steps.app-token.outputs.token }}
-          TOKEN: ${{ secrets.LITRELEASEBOT_TOKEN }}
+          APP_SLUG: ${{ steps.release-app.outputs.app-slug }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          if [ -n "${APP_TOKEN:-}" ]; then
-            echo "value=$APP_TOKEN" >> "$GITHUB_OUTPUT"
-            exit 0
+          bot_json="$(gh api "users/${APP_SLUG}%5Bbot%5D" 2>/dev/null || printf '{}')"
+          login="$(jq -r '.login // ""' <<<"$bot_json")"
+          bot_id="$(jq -r '.id // ""' <<<"$bot_json")"
+          if [ "$login" != "${APP_SLUG}[bot]" ] || ! [[ "$bot_id" =~ ^[0-9]+$ ]]; then
+            echo "::error::Unable to resolve the release automation App bot identity."
+            exit 1
           fi
-          if [ -n "${TOKEN:-}" ]; then
-            echo "value=$TOKEN" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          {
-            echo "::error::RELEASE_BOT_APP_ID and RELEASE_BOT_PRIVATE_KEY,"
-            echo "or LITRELEASEBOT_TOKEN, are required to create release"
-            echo "back-sync branches and PRs."
-          }
-          exit 1
-
-      - name: Checkout
-        uses: actions/checkout@v7
-        with:
-          token: ${{ steps.token.outputs.value }}
-          fetch-depth: 0
+          echo "login=$login" >>"$GITHUB_OUTPUT"
+          echo "email=${bot_id}+${login}@users.noreply.github.com" >>"$GITHUB_OUTPUT"
 
       - name: Open or update release back-sync PR
         env:
-          GH_TOKEN: ${{ steps.token.outputs.value }}
+          GH_TOKEN: ${{ steps.release-app.outputs.token }}
           TAG_INPUT: ${{ github.event.inputs.tag }}
           RELEASE_TAG: ${{ github.event.release.tag_name }}
           REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
+
+          bot_login="$(gh api "users/lightning-it-release-automation%5Bbot%5D" --jq .login)"
+          if [ "$bot_login" != "lightning-it-release-automation[bot]" ]; then
+            echo "::error::Release App identity mismatch: expected lightning-it-release-automation[bot]."
+            exit 1
+          fi
+          gh auth setup-git
 
           tag="${RELEASE_TAG:-${TAG_INPUT:-}}"
           if [ -z "$tag" ]; then
@@ -87,8 +82,8 @@ jobs:
             exit 0
           fi
 
-          git config user.name "litreleasebot"
-          git config user.email "litreleasebot@users.noreply.github.com"
+          git config user.name "lightning-it-release-automation[bot]"
+          git config user.email "307565056+lightning-it-release-automation[bot]@users.noreply.github.com"
           git fetch origin main develop
 
           if git merge-base --is-ancestor origin/main origin/develop; then
@@ -123,8 +118,8 @@ jobs:
             fi
           done
 
-          release_base="$(git rev-parse origin/main^1 2>/dev/null || true)"
-          if [ -n "$release_base" ]; then
+          release_base=""
+          if release_base="$(git rev-parse origin/main^1 2>/dev/null)"; then
             git diff --name-only --diff-filter=D \
               "$release_base" origin/main -- changelogs/fragments/ \
               | xargs -r rm -f
@@ -140,6 +135,7 @@ jobs:
             exit 0
           fi
 
+          gh auth setup-git
           if ! git push --force-with-lease origin "$branch"; then
             existing="$(
               gh pr list \
@@ -161,10 +157,19 @@ jobs:
           if ! gh label list --repo "$REPO" --json name --jq '.[].name' \
             | grep -Fxq skip-changelog
           then
-            gh label create skip-changelog \
-              --repo "$REPO" \
-              --description "Changelog fragment intentionally not required for this PR." \
-              --color "6f42c1" || true
+            label_error="$(mktemp)"
+            if ! gh label create skip-changelog \
+                --repo "$REPO" \
+                --description "Changelog fragment intentionally not required for this PR." \
+                --color "6f42c1" 2>"$label_error"
+            then
+              if ! gh label list --repo "$REPO" --json name --jq '.[].name' \
+                | grep -Fxq skip-changelog
+              then
+                cat "$label_error" >&2
+                exit 1
+              fi
+            fi
           fi
 
           existing="$(

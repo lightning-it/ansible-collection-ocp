@@ -33,7 +33,7 @@ If generic guidance conflicts with repository behavior, you MUST prefer reposito
 3. Managed default files from `shared-assets-lit/default`:
    1. `CODE_OF_CONDUCT.md`
    2. `SECURITY.md`
-   3. `scripts/wunder-devtools-ee.sh`
+   3. `scripts/wunder-container-run.sh`
 4. Managed collection baseline files from `shared-assets-lit/ansible-collection/base`:
    1. `AGENTS.md`
    2. `CONTRIBUTING.md`
@@ -51,7 +51,8 @@ If generic guidance conflicts with repository behavior, you MUST prefer reposito
    14. `scripts/devtools-galaxy-verify.sh`
    15. `scripts/devtools-galaxy.sh`
    16. `scripts/devtools-molecule.sh`
-   17. `.github/workflows/shared-assets-guarded-automerge.yml`
+   17. `scripts/wunder-devtools-ee.sh`
+   18. `.github/workflows/shared-assets-guarded-automerge.yml`
 5. Repo-local exceptions MUST be explicit in the sync workflow and documented in the repository.
 
 ## 2. Repository Baseline (This Repo)
@@ -264,7 +265,10 @@ Automation safety requirements:
 - Protected branches must require pull request review.
 - Only trusted Renovate PRs may be auto-approved by collection automation.
 - A trusted Renovate PR must have `renovate[bot]` as both trigger actor and PR author, a `renovate/*` source
-  branch, `develop` as the base branch, and both `renovate` and `dependencies` labels.
+  branch, `develop` as the base branch, and the `renovate`, `dependencies`, and package-rule-controlled
+  `safe-automerge` labels. The latest `safe-automerge` label event must come from Renovate.
+- Major updates receive `breaking-update`, never receive `safe-automerge`, and must remain manual. Removing or
+  spoofing labels does not make a PR eligible because the guarded workflow checks label-event history.
 - Human, external contributor, and develop-to-main promotion PRs must not be auto-approved or auto-merged by
   collection automation.
 - Do not use `pull_request_target` for Renovate approval or merge automation.
@@ -598,6 +602,32 @@ Example:
 ```
 
 ## 8. Molecule Standards
+
+### 8.0 Test Ownership Boundary (Mandatory)
+
+Collection repositories own reusable role implementation and fast, repository-local validation. Keep Molecule
+scenarios here only when they are deterministic, secret-free, isolated to one collection, and suitable for the
+standard pull-request runner.
+
+`lightning-it/modulix-validation` is the public validation repository and owns execution and orchestration for tests
+that require any of the following:
+
+1. real Incus virtual machines or other persistent infrastructure;
+2. self-hosted or protected runners;
+3. private images, subscriptions, credentials, licenses, DNS, or environment-specific inventory;
+4. cross-collection, cross-service, or end-to-end composition;
+5. Heavy, live, nightly, upgrade, disaster-recovery, or Application Acceptance lifecycles; or
+6. runtime and cleanup budgets that are unsuitable for the normal collection pull-request gate.
+
+Do not add such orchestration to a collection workflow. The collection MAY retain a reusable, environment-neutral
+scenario or helper close to the role, but `modulix-validation` MUST own its matrix, schedule, protected
+environment, secrets, runner contract, lifecycle finalizer, and evidence collection. A collection PR gate may call a
+reusable workflow from `modulix-validation` when that validation is required for release eligibility.
+
+The `-lit` suffix is reserved for private repositories. Do not use it for this public validation repository.
+
+Names such as `*_heavy`, `*-application-acceptance`, `*_live_*`, and `.molecule-mode: protected-incus` are routing
+signals, not permission to run expensive infrastructure directly in the collection's ordinary GitHub Actions job.
 
 ### 8.1 Location
 
