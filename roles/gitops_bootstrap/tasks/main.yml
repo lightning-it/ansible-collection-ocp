@@ -104,6 +104,7 @@
   when: gitops_bootstrap_skip | bool
 
 - name: Validate App-of-Apps repository URL
+  run_once: true
   ansible.builtin.assert:
     that:
       - gitops_bootstrap_git_repo_url | trim | length > 0
@@ -154,6 +155,7 @@
           namespace: openshift-gitops
 
 - name: Reject ambiguous repository Vault password sources
+  run_once: true
   ansible.builtin.assert:
     that:
       - >-
@@ -181,7 +183,7 @@
           item.key: item.value | combine({
             'password': lookup(
               'community.hashi_vault.hashi_vault',
-              item.value.vault_lookup
+              item.value.vault_lookup | trim
             )
           })
         })
@@ -206,7 +208,7 @@
           item.key: item.value | combine({
             'password': lookup(
               'community.hashi_vault.hashi_vault',
-              'secret=' ~ item.value.vault_secret
+              'secret=' ~ (item.value.vault_secret | trim)
               ~ ' url=' ~ g_vault_addr
               ~ ' auth_method=' ~ gitops_bootstrap_hashi_vault_auth_method
               ~ ' validate_certs=' ~ (
