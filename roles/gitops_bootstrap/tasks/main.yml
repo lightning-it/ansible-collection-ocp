@@ -233,6 +233,7 @@
         ) | from_yaml_all
       }}
   with_dict: "{{ gitops_bootstrap_repo_templates }}"
+  when: gitops_bootstrap_operator_state != 'absent'
   no_log: true
 
 - name: Calculate gitops bootstrap value files
@@ -292,7 +293,9 @@
       validate_certs={{ gitops_bootstrap_hashi_vault_validate_certs | string }}
       role_id={{ g_vault_approle | default('') }}
       secret_id={{ g_vault_secretid | default('') }}
-  when: gitops_bootstrap_vault_enabled | bool
+  when:
+    - gitops_bootstrap_operator_state != 'absent'
+    - gitops_bootstrap_vault_enabled | bool
 
 - name: Get approle secrets from vault
   run_once: true
@@ -313,7 +316,9 @@
       }}
   ignore_errors: true
   register: get_secrets
-  when: gitops_bootstrap_vault_enabled | bool
+  when:
+    - gitops_bootstrap_operator_state != 'absent'
+    - gitops_bootstrap_vault_enabled | bool
 
 - name: Create approle secret for external secrets
   delegate_to: localhost
@@ -327,6 +332,7 @@
         ) | from_yaml_all
       }}
   when:
+    - gitops_bootstrap_operator_state != 'absent'
     - gitops_bootstrap_ext_secrets_role_id is defined
       and gitops_bootstrap_ext_secrets_role_id | length > 0
     - gitops_bootstrap_ext_secrets_secret_id is defined
