@@ -190,12 +190,14 @@
                 _gitops_bootstrap_vault_secret
                 if ':' in _gitops_bootstrap_vault_secret
                 else _gitops_bootstrap_vault_secret ~ ':password'
-              ),
-              url=g_vault_addr,
-              auth_method=gitops_bootstrap_hashi_vault_auth_method,
-              validate_certs=gitops_bootstrap_hashi_vault_validate_certs,
-              role_id=g_vault_approle | default(''),
-              secret_id=g_vault_secretid | default('')
+              )
+              ~ ' url=' ~ g_vault_addr
+              ~ ' auth_method=' ~ gitops_bootstrap_hashi_vault_auth_method
+              ~ ' validate_certs=' ~ (
+                gitops_bootstrap_hashi_vault_validate_certs | string
+              )
+              ~ ' role_id=' ~ (g_vault_approle | default(''))
+              ~ ' secret_id=' ~ (g_vault_secretid | default(''))
             )
           })
         })
