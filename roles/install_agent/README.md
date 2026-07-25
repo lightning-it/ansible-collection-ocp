@@ -13,7 +13,9 @@ None.
 - `ocp_install_*`: core installation inputs covering cluster identity (`ocp_install_cluster_name`, `ocp_install_base_domain`, `ocp_install_version`), topology/networking (`ocp_install_machine_network`, `ocp_install_gateway`, `ocp_install_dns_servers`, `ocp_install_ifname`), and image/pull secret data.
 - vSphere-specific variables (`ocp_install_vsphere`, `ocp_install_vcenter_*`, `ocp_install_vsphere_datacenter`, `ocp_install_vsphere_network`, etc.) drive VM provisioning when targeting VMware.
 - Vault integration relies on `ocp_install_hashi_vault_auth_method`, `ocp_install_engine_mount_point`, and lookup strings (`ocp_install_pullsecret_lookup`, `g_root_ca_lookup`, etc.).
-- `install_agent_skip_download: true` skips downloading/unarchiving the OpenShift client tools; ensure `oc` (and `kubectl`) already exist at `$HOME/.local/bin/` on the delegate host.
+- `install_agent_skip_download: true` skips downloading/unarchiving the
+  OpenShift client tools; ensure an executable `oc` binary already exists in
+  `install_agent_cluster_sub_dirs.bin` on the delegate host.
 - Tags such as `ocp_install_post` and `ocp_install_infra` let you rerun post-install steps or infra/app-node configuration independently.
 
 ## Dependencies
