@@ -10,6 +10,6 @@ metadata:
   namespace: openshift-gitops
 data:
 {% for item in gitops_bootstrap_tls_certs %}
-  "{{ item.url | regex_replace('^https?://', '') | regex_replace('/.*$', '') | regex_replace(':\\d+$', '') }}": |-
+  "{{ item.url | trim | regex_replace('^https?://', '') | regex_replace('/.*$', '') | regex_replace(':\\d+$', '') }}": |-
 {{ item.cert | indent(4, true) }}
 {% endfor %}

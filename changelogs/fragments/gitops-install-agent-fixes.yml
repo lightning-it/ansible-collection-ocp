@@ -6,5 +6,3 @@ bugfixes:
   - >-
     gitops_bootstrap - Support Vault secret paths and trusted TLS certificates while honoring the configured
     App-of-Apps repository URL.
-  - >-
-    install_agent - Render the AgentConfig NTP field with the casing required by the OpenShift API.

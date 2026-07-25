@@ -168,6 +168,7 @@
       }}
   loop: "{{ gitops_bootstrap_repo_templates | dict2items }}"
   when:
+    - gitops_bootstrap_operator_state != 'absent'
     - gitops_bootstrap_vault_enabled | bool
     - item.value.vault_lookup | default('', true) | trim | length > 0
     - >-
@@ -201,6 +202,7 @@
       }}
   loop: "{{ gitops_bootstrap_repo_templates | dict2items }}"
   when:
+    - gitops_bootstrap_operator_state != 'absent'
     - gitops_bootstrap_vault_enabled | bool
     - item.value.vault_secret | default('', true) | trim | length > 0
     - item.value.password | default('', true) | trim | length == 0
