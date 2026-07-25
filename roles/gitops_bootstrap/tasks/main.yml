@@ -162,9 +162,12 @@
       }}
   loop: "{{ gitops_bootstrap_repo_templates | dict2items }}"
   when:
-    - gitops_bootstrap_vault_enabled
+    - gitops_bootstrap_vault_enabled | bool
     - item.value.vault_lookup is defined
-    - item.value.vault_secret is not defined
+    - item.value.vault_lookup | trim | length > 0
+    - >-
+      item.value.vault_secret is not defined
+      or item.value.vault_secret | trim | length == 0
     - item.value.password | default('', true) | trim | length == 0
   no_log: true
 
@@ -178,7 +181,11 @@
           item.key: item.value | combine({
             'password': lookup(
               'community.hashi_vault.hashi_vault',
-              'secret=' ~ (item.value.vault_secret if (':' in item.value.vault_secret) else (item.value.vault_secret ~ ':password')),
+              'secret=' ~ (
+                item.value.vault_secret
+                if ':' in item.value.vault_secret
+                else item.value.vault_secret ~ ':password'
+              ),
               url=g_vault_addr,
               auth_method=gitops_bootstrap_hashi_vault_auth_method,
               validate_certs=gitops_bootstrap_hashi_vault_validate_certs,
@@ -190,7 +197,7 @@
       }}
   loop: "{{ gitops_bootstrap_repo_templates | dict2items }}"
   when:
-    - gitops_bootstrap_vault_enabled
+    - gitops_bootstrap_vault_enabled | bool
     - item.value.vault_secret | default('', true) | trim | length > 0
     - item.value.password | default('', true) | trim | length == 0
   no_log: true
@@ -215,6 +222,7 @@
   delegate_to: localhost
   run_once: true
   kubernetes.core.k8s:
+    state: present
     definition: "{{ lookup('template', 'argocd-tls-certs-cm.yml.j2') | from_yaml_all }}"
   when:
     - gitops_bootstrap_tls_certs is defined
