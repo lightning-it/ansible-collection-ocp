@@ -8,6 +8,23 @@
       gitops_bootstrap_git_repo_url must be a non-empty repository URL.
   when: gitops_bootstrap_operator_state != 'absent'
 
+- name: Reject ambiguous repository Vault password sources
+  ansible.builtin.assert:
+    that:
+      - >-
+        not (
+          item.value.vault_lookup | default('', true) | trim | length > 0
+          and
+          item.value.vault_secret | default('', true) | trim | length > 0
+        )
+    fail_msg: >-
+      Repository template {{ item.key }} must define only one of
+      vault_lookup or vault_secret.
+  loop: "{{ gitops_bootstrap_repo_templates | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  when: gitops_bootstrap_vault_enabled | bool
+
 - name: Validate gitops_bootstrap_tls_certs entries
   delegate_to: localhost
   ansible.builtin.assert:

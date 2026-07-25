@@ -161,7 +161,7 @@
           item.key: item.value | combine({
             'password': lookup(
               'community.hashi_vault.hashi_vault',
-              item.value.vault_lookup
+              item.value.vault_lookup | default('', true) | trim
             )
           })
         })
