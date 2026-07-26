@@ -6,6 +6,7 @@ install_agent_dir: /runner
 install_agent_provider: vsphere
 install_agent_platform: vsphere
 install_agent_kubeconfig_dir: '~/.kube'
+install_agent_skip_download: false
 install_agent_run_assets: true
 install_agent_run_wait: true
 install_agent_run_post: true

@@ -39,6 +39,7 @@
     url: "{{ install_agent_occlient }}"
     dest: "{{ install_agent_cluster_sub_dirs.download }}"
     mode: '0644'
+  when: not (install_agent_skip_download | bool)
 
 - name: Unarchive ocp tools
   delegate_to: "{{ install_agent_delegate_to }}"
@@ -57,6 +58,33 @@
   loop:
     - "{{ _install_agent_occlient_file }}"
   changed_when: false
+  when: not (install_agent_skip_download | bool)
+
+- name: Check staged oc binary when download is skipped
+  delegate_to: "{{ install_agent_delegate_to }}"
+  run_once: true
+  ansible.builtin.stat:
+    path: "{{ install_agent_cluster_sub_dirs.bin }}/oc"
+    follow: true
+  register: install_agent_oc_binary
+  when: install_agent_skip_download | bool
+
+- name: Fail if staged oc binary is unusable when download is skipped
+  delegate_to: "{{ install_agent_delegate_to }}"
+  run_once: true
+  ansible.builtin.fail:
+    msg: >-
+      install_agent_skip_download is true, but
+      {{ install_agent_cluster_sub_dirs.bin }}/oc is not a regular executable
+      file. Stage an executable oc binary at this path on
+      {{ install_agent_delegate_to }} or set install_agent_skip_download to
+      false.
+  when:
+    - install_agent_skip_download | bool
+    - >-
+      not install_agent_oc_binary.stat.exists
+      or not install_agent_oc_binary.stat.isreg
+      or not install_agent_oc_binary.stat.executable
 
 - name: Create imageDigestMirrorSet.yaml
   ansible.builtin.template:

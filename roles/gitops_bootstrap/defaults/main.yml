@@ -34,3 +34,4 @@ gitops_bootstrap_external_secrets_path: >-
   }}
 gitops_bootstrap_hashi_vault_auth_method: approle
 gitops_bootstrap_hashi_vault_validate_certs: true
+gitops_bootstrap_tls_certs: []

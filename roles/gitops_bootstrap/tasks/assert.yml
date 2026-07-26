@@ -1,0 +1,93 @@
+---
+- name: Validate gitops repository URL
+  run_once: true
+  delegate_to: localhost
+  ansible.builtin.assert:
+    that:
+      - gitops_bootstrap_git_repo_url | trim | length > 0
+    fail_msg: >-
+      gitops_bootstrap_git_repo_url must be a non-empty repository URL.
+  when: gitops_bootstrap_operator_state != 'absent'
+
+- name: Reject ambiguous repository Vault password sources
+  run_once: true
+  delegate_to: localhost
+  ansible.builtin.assert:
+    that:
+      - >-
+        not (
+          item.value.vault_lookup | default('', true) | trim | length > 0
+          and
+          item.value.vault_secret | default('', true) | trim | length > 0
+        )
+    fail_msg: >-
+      Repository template {{ item.key }} must define only one of
+      vault_lookup or vault_secret.
+  loop: "{{ gitops_bootstrap_repo_templates | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  when:
+    - gitops_bootstrap_operator_state != 'absent'
+    - gitops_bootstrap_vault_enabled | bool
+
+- name: Validate gitops_bootstrap_tls_certs entries
+  run_once: true
+  delegate_to: localhost
+  ansible.builtin.assert:
+    that:
+      - item.url is defined
+      - item.url | default('', true) | trim | length > 0
+      - >-
+        item.url
+        | default('', true)
+        | trim
+        | regex_replace('^https?://', '')
+        | regex_replace('/.*$', '')
+        | regex_replace(':\\d+$', '')
+        | length > 0
+      - >-
+        (
+          item.url
+          | default('', true)
+          | trim
+          | regex_replace('^https?://', '')
+          | regex_replace('/.*$', '')
+          | regex_replace(':\\d+$', '')
+        ) is match('^[-._a-zA-Z0-9]+$')
+      - item.cert is defined
+      - item.cert | default('', true) | trim | length > 0
+    fail_msg: >-
+      Each gitops_bootstrap_tls_certs entry must include non-empty 'url' and
+      'cert' keys.
+  loop: "{{ gitops_bootstrap_tls_certs }}"
+  when:
+    - gitops_bootstrap_operator_state != 'absent'
+    - gitops_bootstrap_tls_certs is defined
+    - gitops_bootstrap_tls_certs | length > 0
+
+- name: Reject duplicate normalized TLS certificate hosts
+  run_once: true
+  delegate_to: localhost
+  vars:
+    gitops_bootstrap_normalized_tls_hosts: >-
+      {{
+        gitops_bootstrap_tls_certs
+        | map(attribute='url')
+        | map('trim')
+        | map('regex_replace', '^https?://', '')
+        | map('regex_replace', '/.*$', '')
+        | map('regex_replace', ':\\d+$', '')
+        | list
+      }}
+  ansible.builtin.assert:
+    that:
+      - >-
+        gitops_bootstrap_normalized_tls_hosts | unique | length
+        ==
+        gitops_bootstrap_normalized_tls_hosts | length
+    fail_msg: >-
+      gitops_bootstrap_tls_certs URLs must normalize to unique host names.
+  when:
+    - gitops_bootstrap_operator_state != 'absent'
+    - gitops_bootstrap_tls_certs is defined
+    - gitops_bootstrap_tls_certs | length > 0
