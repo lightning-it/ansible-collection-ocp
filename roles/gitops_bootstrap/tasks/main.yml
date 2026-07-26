@@ -124,11 +124,11 @@
       {{ gitops_bootstrap_operator_starting_csv }}
     manage_operator_approve: >-
       {{ gitops_bootstrap_approve }}
+    manage_operator_state: "{{ gitops_bootstrap_operator_state }}"
     manage_operator_subscription_extras: >-
       {{ gitops_bootstrap_operator_subscription_extras }}
   ansible.builtin.include_role:
     name: lit.ocp.manage_operator
-  when: gitops_bootstrap_operator_state != 'absent'
 
 - name: >-
     Add cluster-admin role to serviceaccount
@@ -136,7 +136,7 @@
   delegate_to: localhost
   run_once: true
   kubernetes.core.k8s:
-    state: present
+    state: "{{ gitops_bootstrap_operator_state }}"
     definition:
       apiVersion: rbac.authorization.k8s.io/v1
       kind: ClusterRoleBinding
@@ -151,8 +151,6 @@
         - kind: ServiceAccount
           name: openshift-gitops-argocd-application-controller
           namespace: openshift-gitops
-  when: gitops_bootstrap_operator_state != 'absent'
-
 - name: Fetch repo passwords from Vault lookup strings
   delegate_to: localhost
   run_once: true
