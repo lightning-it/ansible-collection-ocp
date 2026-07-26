@@ -151,6 +151,7 @@
         - kind: ServiceAccount
           name: openshift-gitops-argocd-application-controller
           namespace: openshift-gitops
+  when: gitops_bootstrap_operator_state != 'absent'
 
 - name: Fetch repo passwords from Vault lookup strings
   delegate_to: localhost
