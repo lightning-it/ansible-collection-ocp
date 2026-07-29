@@ -35,3 +35,16 @@ releases:
       - enterprise-readme-standard.yml
       - shared-assets-lit-governance.yml
     release_date: '2026-07-06'
+  1.8.0:
+    changes:
+      bugfixes:
+        - collection_tooling - Dispatch releases through protected main, use the configured
+          Galaxy environment secret, trust lint-version metadata from the managed
+          image, and ignore generated Python and collection-install artifacts.
+      minor_changes:
+        - collection_tooling - Synchronize the centrally managed Renovate policy and
+          guarded automation workflows.
+    fragments:
+      - shared-assets-collection-tooling.yml
+      - shared-assets-renovate-policy.yml
+    release_date: '2026-07-19'
