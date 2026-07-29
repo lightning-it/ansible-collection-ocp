@@ -60,18 +60,11 @@ jobs:
         run: |
           set -euo pipefail
 
-          bot_json="$(gh api "users/lightning-it-release-automation%5Bbot%5D")"
-          bot_login="$(jq -r '.login' <<<"$bot_json")"
-          bot_id="$(jq -r '.id' <<<"$bot_json")"
+          bot_login="$(gh api "users/lightning-it-release-automation%5Bbot%5D" --jq .login)"
           if [ "$bot_login" != "lightning-it-release-automation[bot]" ]; then
             echo "::error::Release App identity mismatch: expected lightning-it-release-automation[bot]."
             exit 1
           fi
-          if ! [[ "$bot_id" =~ ^[0-9]+$ ]]; then
-            echo "::error::Release App identity has no valid numeric GitHub user ID."
-            exit 1
-          fi
-          bot_email="${bot_id}+${bot_login}@users.noreply.github.com"
           gh auth setup-git
 
           tag="${RELEASE_TAG:-${TAG_INPUT:-}}"
@@ -89,8 +82,8 @@ jobs:
             exit 0
           fi
 
-          git config user.name "$bot_login"
-          git config user.email "$bot_email"
+          git config user.name "lightning-it-release-automation[bot]"
+          git config user.email "307565056+lightning-it-release-automation[bot]@users.noreply.github.com"
           git fetch origin main develop
 
           if git merge-base --is-ancestor origin/main origin/develop; then
