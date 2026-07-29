@@ -4,6 +4,19 @@ Lightning IT Collection Release Notes Release Notes
 
 .. contents:: Topics
 
+v1.8.0
+======
+
+Minor Changes
+-------------
+
+- collection_tooling - Synchronize the centrally managed Renovate policy and guarded automation workflows.
+
+Bugfixes
+--------
+
+- collection_tooling - Dispatch releases through protected main, use the configured Galaxy environment secret, trust lint-version metadata from the managed image, and ignore generated Python and collection-install artifacts.
+
 v1.7.0
 ======
 
