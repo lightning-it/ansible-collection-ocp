@@ -10,7 +10,7 @@ spec:
   project: default
   source:
     path: .
-    repoURL: "{{ gitops_bootstrap_git_repo_url }}/app-of-apps.git"
+    repoURL: "{{ gitops_bootstrap_git_repo_url | trim }}"
     targetRevision: "{{ gitops_bootstrap_target_revision }}"
     helm:
       valueFiles:

@@ -9,6 +9,7 @@
       - install_agent_run_post is boolean
       - install_agent_run_setup_nodes is boolean
       - install_agent_power_on_nodes is boolean
+      - install_agent_skip_download is boolean
       - install_agent_write_kube_credentials is boolean
       - install_agent_control_plane_replicas | int >= 1
       - install_agent_compute_replicas | int >= 0

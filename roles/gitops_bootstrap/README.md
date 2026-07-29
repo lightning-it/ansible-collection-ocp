@@ -10,8 +10,14 @@ None.
 
 - `gitops_bootstrap_operator_*`: tune the Subscription (channel, source, starting CSV, approval, extras).
 - `gitops_bootstrap_operator_state` / `gitops_bootstrap_argocd_state`: control whether the operator/App-of-Apps exist (default `present`).
-- `gitops_bootstrap_repo_templates`: dictionary describing Git credentials to render into secrets; supports `vault_lookup` entries when `gitops_bootstrap_vault_enabled: true`.
+- `gitops_bootstrap_git_repo_url`: full repository URL used as the App-of-Apps
+  `Application.spec.source.repoURL`; the role does not append a repository name.
+- `gitops_bootstrap_repo_templates`: dictionary describing Git credentials to render into secrets; supports complete
+   `vault_lookup` terms and `vault_secret` lookup targets in either `<path>:<field>`
+   form or `<path>` form (which defaults to the `password` field) when
+   `gitops_bootstrap_vault_enabled: true`.
 - `gitops_bootstrap_vault_enabled`, `gitops_bootstrap_external_secrets_path`, `g_vault_*`: enable HashiCorp Vault lookups for repo passwords and external secret approles.
+- `gitops_bootstrap_tls_certs`: list of `url` and `cert` mappings rendered into Argo CD's trusted TLS certificate ConfigMap.
 
 ## Dependencies
 

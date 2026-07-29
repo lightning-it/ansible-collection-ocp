@@ -6,7 +6,7 @@ metadata:
 {% set rendezvous_node = install_agent_effective_nodes | first %}
 rendezvousIP: {{ install_agent_rendezvous_ip | default(rendezvous_node.ip, true) }}
 {% if install_agent_ntp_servers is defined %}
-AdditionalNTPSources: {{ install_agent_ntp_servers | map(attribute='hostname') | list }}
+additionalNTPSources: {{ install_agent_ntp_servers | map(attribute='hostname') | list }}
 {% endif %}
 hosts:
 {% for node in install_agent_effective_nodes %}

@@ -103,6 +103,12 @@
   ansible.builtin.meta: end_play
   when: gitops_bootstrap_skip | bool
 
+- name: Validate gitops bootstrap inputs
+  run_once: true
+  ansible.builtin.import_tasks: assert.yml
+  tags:
+    - always
+
 - name: Manage gitops operator
   run_once: true
   vars:
@@ -118,6 +124,7 @@
       {{ gitops_bootstrap_operator_starting_csv }}
     manage_operator_approve: >-
       {{ gitops_bootstrap_approve }}
+    manage_operator_state: "{{ gitops_bootstrap_operator_state }}"
     manage_operator_subscription_extras: >-
       {{ gitops_bootstrap_operator_subscription_extras }}
   ansible.builtin.include_role:
@@ -129,7 +136,7 @@
   delegate_to: localhost
   run_once: true
   kubernetes.core.k8s:
-    state: present
+    state: "{{ gitops_bootstrap_operator_state }}"
     definition:
       apiVersion: rbac.authorization.k8s.io/v1
       kind: ClusterRoleBinding
@@ -144,8 +151,7 @@
         - kind: ServiceAccount
           name: openshift-gitops-argocd-application-controller
           namespace: openshift-gitops
-
-- name: Fetch repo passwords from Vault
+- name: Fetch repo passwords from Vault lookup strings
   delegate_to: localhost
   run_once: true
   ansible.builtin.set_fact:
@@ -155,16 +161,80 @@
           item.key: item.value | combine({
             'password': lookup(
               'community.hashi_vault.hashi_vault',
-              item.value.vault_lookup
+              item.value.vault_lookup | default('', true) | trim
             )
           })
         })
       }}
   loop: "{{ gitops_bootstrap_repo_templates | dict2items }}"
   when:
-    - gitops_bootstrap_vault_enabled
-    - item.value.vault_lookup is defined
+    - gitops_bootstrap_operator_state != 'absent'
+    - gitops_bootstrap_vault_enabled | bool
+    - item.value.vault_lookup | default('', true) | trim | length > 0
+    - >-
+      item.value.vault_secret | default('', true) | trim | length == 0
+    - item.value.password | default('', true) | trim | length == 0
   no_log: true
+
+- name: Fetch repo passwords from Vault secret paths
+  delegate_to: localhost
+  run_once: true
+  ansible.builtin.set_fact:
+    gitops_bootstrap_repo_templates: >-
+      {{
+        gitops_bootstrap_repo_templates | combine({
+          item.key: item.value | combine({
+            'password': lookup(
+              'community.hashi_vault.hashi_vault',
+              'secret=' ~ (
+                _gitops_bootstrap_vault_secret
+                if ':' in _gitops_bootstrap_vault_secret
+                else _gitops_bootstrap_vault_secret ~ ':password'
+              )
+              ~ ' url=' ~ g_vault_addr
+              ~ ' auth_method=' ~ gitops_bootstrap_hashi_vault_auth_method
+              ~ ' validate_certs=' ~ (
+                gitops_bootstrap_hashi_vault_validate_certs | string
+              )
+              ~ ' role_id=' ~ (g_vault_approle | default(''))
+              ~ ' secret_id=' ~ (g_vault_secretid | default(''))
+            )
+          })
+        })
+      }}
+  loop: "{{ gitops_bootstrap_repo_templates | dict2items }}"
+  when:
+    - gitops_bootstrap_operator_state != 'absent'
+    - gitops_bootstrap_vault_enabled | bool
+    - item.value.vault_secret | default('', true) | trim | length > 0
+    - item.value.password | default('', true) | trim | length == 0
+  vars:
+    _gitops_bootstrap_vault_secret: "{{ item.value.vault_secret | trim }}"
+  no_log: true
+
+- name: Remove tls config when it is not configured
+  delegate_to: localhost
+  run_once: true
+  kubernetes.core.k8s:
+    state: absent
+    api_version: v1
+    kind: ConfigMap
+    name: argocd-tls-certs-cm
+    namespace: openshift-gitops
+  when: >-
+    gitops_bootstrap_operator_state == 'absent'
+    or (gitops_bootstrap_tls_certs | default([]) | length == 0)
+
+- name: Create tls config when it is configured
+  delegate_to: localhost
+  run_once: true
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'argocd-tls-certs-cm.yml.j2') | from_yaml_all }}"
+  when:
+    - gitops_bootstrap_operator_state != 'absent'
+    - gitops_bootstrap_tls_certs is defined
+    - gitops_bootstrap_tls_certs | length > 0
 
 - name: Create repo secret templates for first deployment
   delegate_to: localhost
@@ -178,6 +248,7 @@
         ) | from_yaml_all
       }}
   with_dict: "{{ gitops_bootstrap_repo_templates }}"
+  when: gitops_bootstrap_operator_state != 'absent'
   no_log: true
 
 - name: Calculate gitops bootstrap value files
@@ -237,7 +308,9 @@
       validate_certs={{ gitops_bootstrap_hashi_vault_validate_certs | string }}
       role_id={{ g_vault_approle | default('') }}
       secret_id={{ g_vault_secretid | default('') }}
-  when: gitops_bootstrap_vault_enabled | bool
+  when:
+    - gitops_bootstrap_operator_state != 'absent'
+    - gitops_bootstrap_vault_enabled | bool
 
 - name: Get approle secrets from vault
   run_once: true
@@ -258,7 +331,9 @@
       }}
   ignore_errors: true
   register: get_secrets
-  when: gitops_bootstrap_vault_enabled | bool
+  when:
+    - gitops_bootstrap_operator_state != 'absent'
+    - gitops_bootstrap_vault_enabled | bool
 
 - name: Create approle secret for external secrets
   delegate_to: localhost
@@ -272,6 +347,7 @@
         ) | from_yaml_all
       }}
   when:
+    - gitops_bootstrap_operator_state != 'absent'
     - gitops_bootstrap_ext_secrets_role_id is defined
       and gitops_bootstrap_ext_secrets_role_id | length > 0
     - gitops_bootstrap_ext_secrets_secret_id is defined
