@@ -212,7 +212,20 @@
     _gitops_bootstrap_vault_secret: "{{ item.value.vault_secret | trim }}"
   no_log: true
 
-- name: Create tls config
+- name: Remove tls config when it is not configured
+  delegate_to: localhost
+  run_once: true
+  kubernetes.core.k8s:
+    state: absent
+    api_version: v1
+    kind: ConfigMap
+    name: argocd-tls-certs-cm
+    namespace: openshift-gitops
+  when: >-
+    gitops_bootstrap_operator_state == 'absent'
+    or (gitops_bootstrap_tls_certs | default([]) | length == 0)
+
+- name: Create tls config when it is configured
   delegate_to: localhost
   run_once: true
   kubernetes.core.k8s:

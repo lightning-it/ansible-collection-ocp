@@ -1,0 +1,6 @@
+---
+bugfixes:
+  - >-
+    Remove the managed Argo CD trusted TLS certificate ConfigMap when no TLS
+    certificates are configured or the GitOps operator is removed, preventing
+    stale trust configuration.
