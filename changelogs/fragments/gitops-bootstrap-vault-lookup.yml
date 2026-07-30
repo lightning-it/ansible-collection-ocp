@@ -1,4 +1,0 @@
----
-bugfixes:
-  - Normalize GitOps bootstrap Vault secret lookups to the collection-compatible lookup-term format and document
-    the required ``<path>:<field>`` target.

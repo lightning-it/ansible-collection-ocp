@@ -48,3 +48,30 @@ releases:
       - shared-assets-collection-tooling.yml
       - shared-assets-renovate-policy.yml
     release_date: '2026-07-19'
+  1.9.0:
+    changes:
+      bugfixes:
+        - Normalize GitOps bootstrap Vault secret lookups to the collection-compatible
+          lookup-term format and document the required ``<path>:<field>`` target.
+        - Remove the managed Argo CD trusted TLS certificate ConfigMap when no TLS
+          certificates are configured or the GitOps operator is removed, preventing
+          stale trust configuration.
+        - gitops_bootstrap - Honor the configured App-of-Apps repository URL without
+          appending a fixed suffix.
+        - gitops_bootstrap - Support Vault secret paths and trusted TLS certificates
+          while honoring the configured App-of-Apps repository URL.
+        - install_agent - Render the AgentConfig NTP field with the casing required
+          by the OpenShift API.
+      minor_changes:
+        - gitops_bootstrap - Add Vault secret-path support for repository credential
+          templates while retaining complete lookup-term compatibility.
+        - install_agent - Add an option to reuse staged OpenShift client tools instead
+          of downloading them again.
+    fragments:
+      - adr-assurance.yml
+      - gitops-bootstrap-tls-cleanup.yml
+      - gitops-bootstrap-vault-lookup.yml
+      - gitops-install-agent-fixes.yml
+      - gitops-vault-secret-agent-config.yml
+      - shared-assets-sync.yml
+    release_date: '2026-07-29'

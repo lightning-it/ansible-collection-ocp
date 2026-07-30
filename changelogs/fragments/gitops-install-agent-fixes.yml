@@ -1,8 +1,0 @@
----
-minor_changes:
-  - >-
-    install_agent - Add an option to reuse staged OpenShift client tools instead of downloading them again.
-bugfixes:
-  - >-
-    gitops_bootstrap - Support Vault secret paths and trusted TLS certificates while honoring the configured
-    App-of-Apps repository URL.
