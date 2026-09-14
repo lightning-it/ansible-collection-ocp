@@ -39,6 +39,7 @@ build_ignore:
   - .git
   - .github
   - .gitignore
+  - .lit
   - .molecule
   - ansible_collections
   - build
