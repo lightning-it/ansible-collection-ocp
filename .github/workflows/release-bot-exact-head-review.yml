@@ -74,6 +74,8 @@ jobs:
       pull-requests: read
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    outputs:
+      producer_run_id: ${{ steps.dedupe.outputs.producer_run_id }}
 
     env:
       BASE_REF: ${{ inputs.base_ref }}
@@ -537,11 +539,12 @@ jobs:
           }
           neutral_checks="$(read_neutral_checks)"
           matching="$(jq -c \
+            --arg external_id "${external_id}" \
             --arg head "${EXPECTED_HEAD}" '
               [.[].check_runs[]? |
                 select(.name == "Current revision review") |
                 select(.app.id == 15368 and .app.slug == "github-actions") |
-                select(.head_sha == $head)]
+                select(.head_sha == $head and .external_id == $external_id)]
             ' <<<"${neutral_checks}")"
           count="$(jq 'length' <<<"${matching}")"
           if [ "${count}" -gt 1 ]; then
@@ -1079,7 +1082,7 @@ jobs:
           EXPECTED_HEAD: ${{ inputs.expected_head }}
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ inputs.pr_number }}
-          PRODUCER_RUN_ID: ${{ github.run_id }}
+          PRODUCER_RUN_ID: ${{ needs.exact-revision-codex-review.outputs.producer_run_id }}
           REPOSITORY: ${{ github.repository }}
         run: |
           set -euo pipefail

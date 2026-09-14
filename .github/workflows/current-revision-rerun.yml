@@ -270,9 +270,38 @@ jobs:
           [[ "${live_labels_sha256}" =~ ^[0-9a-f]{64}$ ]]
           live_last_edited_at="$(read_metadata_revision)"
 
+          expected_producer_id="${GITHUB_RUN_ID}"
+          if [ "${GITHUB_EVENT_NAME}" = workflow_dispatch ]; then
+            expected_producer_id="${EVENT_PRODUCER_RUN_ID}"
+          fi
+          [[ "${expected_producer_id}" =~ ^[1-9][0-9]*$ ]]
+
           neutral=''
           for neutral_attempt in $(seq 1 40); do
-            neutral_inventory="$(read_neutral_inventory)"
+            neutral_inventory="$(read_neutral_inventory | jq -c \
+              --arg base "${EXPECTED_BASE}" \
+              --arg head "${EXPECTED_HEAD}" \
+              --arg pr "${PR_NUMBER}" \
+              --arg producer "${expected_producer_id}" '
+                [.[] |
+                  select((.external_id // "") as $external_id |
+                    ($external_id | test(
+                      "^mlx90-current-revision:v4:" + $producer
+                      + ":[0-9a-f]{64}$"
+                    ))
+                    or ($external_id | test(
+                      "^mlx90-current-revision:"
+                      + "(copilot|managed-sync|renovate|ancestry-backmerge):"
+                      + "v6:" + $pr + ":" + $producer + ":"
+                      + $base + ":" + $head + "$"
+                    ))
+                    or ($external_id | test(
+                      "^mlx90-current-revision:(copilot|ancestry-backmerge):"
+                      + "v5:" + $producer + ":" + $base + ":"
+                      + $head + "$"
+                    )))
+                ]
+              ')"
             neutral_count="$(jq 'length' <<<"${neutral_inventory}")"
             test "${neutral_count}" -le 1
             if [ "${neutral_count}" -eq 1 ]; then

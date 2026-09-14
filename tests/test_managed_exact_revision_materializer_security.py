@@ -131,6 +131,36 @@ class ExactRevisionMaterializerTests(unittest.TestCase):
             workflow.index('-f "details_url=${check_url}"'),
         )
 
+    def test_deduped_producer_identity_crosses_the_job_boundary(self) -> None:
+        workflow = REVIEW_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn(
+            "producer_run_id: ${{ steps.dedupe.outputs.producer_run_id }}",
+            workflow,
+        )
+        self.assertIn(
+            "PRODUCER_RUN_ID: "
+            "${{ needs.exact-revision-codex-review.outputs.producer_run_id }}",
+            workflow,
+        )
+        self.assertNotIn("PRODUCER_RUN_ID: ${{ github.run_id }}", workflow)
+
+    def test_neutral_reservations_are_selected_by_exact_producer_input(self) -> None:
+        review = REVIEW_WORKFLOW.read_text(encoding="utf-8")
+        rerun = RERUN_WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn(
+            "select(.head_sha == $head and .external_id == $external_id)",
+            review,
+        )
+        self.assertIn('expected_producer_id="${GITHUB_RUN_ID}"', rerun)
+        self.assertIn(
+            'expected_producer_id="${EVENT_PRODUCER_RUN_ID}"',
+            rerun,
+        )
+        self.assertIn(
+            '"^mlx90-current-revision:v4:" + $producer',
+            rerun,
+        )
+
     def test_pr_number_is_validated_before_protected_review_work(self) -> None:
         workflow = REVIEW_WORKFLOW.read_text(encoding="utf-8")
         validation = '[[ "${PR_NUMBER}" =~ ^[1-9][0-9]*$ ]]'
