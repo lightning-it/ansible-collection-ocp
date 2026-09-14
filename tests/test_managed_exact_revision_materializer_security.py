@@ -161,6 +161,59 @@ class ExactRevisionMaterializerTests(unittest.TestCase):
             rerun,
         )
 
+    def test_check_details_link_to_the_exact_producer_run(self) -> None:
+        review = REVIEW_WORKFLOW.read_text(encoding="utf-8")
+        rerun = RERUN_WORKFLOW.read_text(encoding="utf-8")
+        self.assertNotIn(
+            'check_url="${GITHUB_SERVER_URL}/${REPOSITORY}/runs/${check_id}"',
+            review,
+        )
+        self.assertIn(
+            'check_url="${GITHUB_SERVER_URL}/${REPOSITORY}/actions/runs/'
+            '${PRODUCER_RUN_ID}"',
+            review,
+        )
+        self.assertIn(
+            'test "${neutral_details_url}" = "${producer_url}"',
+            rerun,
+        )
+        self.assertNotIn(
+            '${GITHUB_SERVER_URL}/${REPOSITORY}/runs/${reservation_id}',
+            rerun,
+        )
+
+    def test_live_pull_request_rejects_non_object_payloads(self) -> None:
+        arguments = types.SimpleNamespace(
+            repository="lightning-it/example",
+            pull_request=7,
+            base_ref="main",
+            expected_base="a" * 40,
+            expected_head="b" * 40,
+        )
+        for payload, message in (
+            ("[]", "response must be a JSON object"),
+            ('{"user": []}', "field user must be a JSON object"),
+            (
+                '{"user": {}, "base": {"repo": []}, "head": {"repo": {}}}',
+                "field base.repo must be a JSON object",
+            ),
+        ):
+            with (
+                self.subTest(payload=payload),
+                mock.patch.object(self.module, "executable", return_value="/usr/bin/gh"),
+                mock.patch.object(
+                    self.module,
+                    "run",
+                    return_value=types.SimpleNamespace(stdout=payload),
+                ),
+                mock.patch.dict(os.environ, {"GH_TOKEN": "test-token"}),
+                self.assertRaisesRegex(self.module.MaterializationError, message),
+            ):
+                self.module.read_live_pull_request(
+                    arguments,
+                    home=Path("/tmp"),
+                )
+
     def test_pr_number_is_validated_before_protected_review_work(self) -> None:
         workflow = REVIEW_WORKFLOW.read_text(encoding="utf-8")
         validation = '[[ "${PR_NUMBER}" =~ ^[1-9][0-9]*$ ]]'

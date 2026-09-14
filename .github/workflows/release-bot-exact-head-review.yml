@@ -244,7 +244,11 @@ jobs:
           fi
           if [ "${count}" -eq 1 ]; then
             prior_check_id="$(jq -er '.[0].id | select(type == "number" and . > 0)' <<<"${matching}")"
-            details_url="${GITHUB_SERVER_URL}/${REPOSITORY}/runs/${prior_check_id}"
+            prior_external_id="$(jq -r '.[0].external_id // empty' <<<"${matching}")"
+            prior_run_id="${prior_external_id#"${external_prefix}"}"
+            [[ "${prior_run_id}" =~ ^[1-9][0-9]*$ ]]
+            test "${prior_external_id}" = "${external_prefix}${prior_run_id}"
+            details_url="${GITHUB_SERVER_URL}/${REPOSITORY}/actions/runs/${prior_run_id}"
             if [ "$(jq -r '.[0].details_url // empty' <<<"${matching}")" != "${details_url}" ]; then
               rebound="$(gh api --method PATCH \
                 "repos/${REPOSITORY}/check-runs/${prior_check_id}" \
@@ -275,11 +279,7 @@ jobs:
             test "$(jq -r '.[0].details_url // empty' <<<"${matching}")" = "${details_url}"
             status="$(jq -r '.[0].status' <<<"${matching}")"
             conclusion="$(jq -r '.[0].conclusion // ""' <<<"${matching}")"
-            prior_external_id="$(jq -r '.[0].external_id // empty' <<<"${matching}")"
-            prior_run_id="${prior_external_id#"${external_prefix}"}"
-            [[ "${prior_run_id}" =~ ^[1-9][0-9]*$ ]]
-            test "${prior_external_id}" = "${external_prefix}${prior_run_id}"
-            producer_run_url="${GITHUB_SERVER_URL}/${REPOSITORY}/actions/runs/${prior_run_id}"
+            producer_run_url="${details_url}"
             prior_run="$(gh api "repos/${REPOSITORY}/actions/runs/${prior_run_id}")"
             jq -e \
               --arg actor 'lightning-it-release-automation[bot]' \
@@ -451,7 +451,7 @@ jobs:
               echo "producer_run_id=${prior_run_id}"
               echo "recovered=true"
             } >>"${GITHUB_OUTPUT}"
-            check_url="${GITHUB_SERVER_URL}/${REPOSITORY}/runs/${check_id}"
+            check_url="${GITHUB_SERVER_URL}/${REPOSITORY}/actions/runs/${prior_run_id}"
             reservation="$(gh api --method PATCH "repos/${REPOSITORY}/check-runs/${check_id}" \
               -f "details_url=${check_url}")"
             jq -e \
@@ -482,7 +482,7 @@ jobs:
             echo "producer_run_id=${GITHUB_RUN_ID}"
             echo "recovered=false"
           } >>"${GITHUB_OUTPUT}"
-          check_url="${GITHUB_SERVER_URL}/${REPOSITORY}/runs/${check_id}"
+          check_url="${GITHUB_SERVER_URL}/${REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           reservation="$(gh api --method PATCH "repos/${REPOSITORY}/check-runs/${check_id}" \
             -f "details_url=${check_url}")"
           jq -e \
@@ -554,7 +554,7 @@ jobs:
           if [ "${count}" -eq 1 ]; then
             check_id="$(jq -er '.[0].id | select(type == "number" and . > 0)' <<<"${matching}")"
             echo "check_id=${check_id}" >>"${GITHUB_OUTPUT}"
-            check_url="${GITHUB_SERVER_URL}/${REPOSITORY}/runs/${check_id}"
+            check_url="${GITHUB_SERVER_URL}/${REPOSITORY}/actions/runs/${PRODUCER_RUN_ID}"
             jq -e \
               --arg external_id "${external_id}" \
               --arg head "${EXPECTED_HEAD}" \
@@ -635,7 +635,7 @@ jobs:
           {
             echo "check_id=${check_id}"
           } >>"${GITHUB_OUTPUT}"
-          check_url="${GITHUB_SERVER_URL}/${REPOSITORY}/runs/${check_id}"
+          check_url="${GITHUB_SERVER_URL}/${REPOSITORY}/actions/runs/${PRODUCER_RUN_ID}"
           created="$(api_patch "repos/${REPOSITORY}/check-runs/${check_id}" \
             -f "details_url=${check_url}")"
           jq -e \
@@ -815,7 +815,7 @@ jobs:
           [[ "${NEUTRAL_CHECK_ID}" =~ ^[1-9][0-9]*$ ]]
           expected_neutral_external_id="mlx90-current-revision:v4:${producer_run_id}:${input_sha256}"
           test "${EXPECTED_NEUTRAL_EXTERNAL_ID}" = "${expected_neutral_external_id}"
-          neutral_url="${GITHUB_SERVER_URL}/${REPOSITORY}/runs/${NEUTRAL_CHECK_ID}"
+          neutral_url="${GITHUB_SERVER_URL}/${REPOSITORY}/actions/runs/${producer_run_id}"
           api_patch \
             "repos/${REPOSITORY}/check-runs/${NEUTRAL_CHECK_ID}" \
             -f status=completed \

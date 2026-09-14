@@ -579,6 +579,14 @@ def read_live_pull_request(
         pull_request = json.loads(result.stdout)
     except json.JSONDecodeError as error:
         fail(f"GitHub returned malformed pull-request JSON: {error}")
+    if not isinstance(pull_request, dict):
+        fail("GitHub pull-request response must be a JSON object.")
+
+    def required_object(name: str, value: Any) -> dict[str, Any]:
+        if not isinstance(value, dict):
+            fail(f"GitHub pull-request field {name} must be a JSON object.")
+        return value
+
     expected = {
         "state": "open",
         "draft": False,
@@ -590,11 +598,11 @@ def read_live_pull_request(
         "head_sha": arguments.expected_head,
         "head_repository": arguments.repository,
     }
-    user = pull_request.get("user") or {}
-    base = pull_request.get("base") or {}
-    head = pull_request.get("head") or {}
-    base_repository = base.get("repo") or {}
-    head_repository = head.get("repo") or {}
+    user = required_object("user", pull_request.get("user"))
+    base = required_object("base", pull_request.get("base"))
+    head = required_object("head", pull_request.get("head"))
+    base_repository = required_object("base.repo", base.get("repo"))
+    head_repository = required_object("head.repo", head.get("repo"))
     observed = {
         "state": pull_request.get("state"),
         "draft": pull_request.get("draft"),
