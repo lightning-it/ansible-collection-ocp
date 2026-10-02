@@ -1,0 +1,3 @@
+---
+trivial:
+  - Exclude repository-only audit metadata from collection artifacts.

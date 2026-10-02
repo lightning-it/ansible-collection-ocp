@@ -1,0 +1,7 @@
+{
+  "develop_parent_sha": "5865096b755cabef21a56adfe602c363ba58f226",
+  "main_sha": "65894e7f0c933d2f5b2b88914cf861bc0f36cc99",
+  "purpose": "Bind the reviewed main ancestry backmerge.",
+  "repository": "lightning-it/ansible-collection-ocp",
+  "schema_version": 1
+}
